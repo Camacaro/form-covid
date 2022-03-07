@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button } from '@mui/material';
+import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button, Autocomplete } from '@mui/material';
 import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { Page } from '../components/Page';
@@ -37,7 +37,10 @@ const initialValues = {
   telefono_adicional: '',
   ocupacion: '',
   lugar_trabajo: '',
-  // genero: '',
+  genero: {
+    value: '',
+    label: ''
+  },
 
   // // viajeRealizado
   // viaje_realizado: false,
@@ -73,7 +76,22 @@ const validationSchema = Yup.object().shape({
   telefono_adicional: Yup.string().required('Teléfono adicional es requerido'),
   ocupacion: Yup.string().required('Ocupación es requerido'),
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
+  genero: Yup.object({
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
 })
+
+const generos = [
+  {
+    value: 'M',
+    label: 'Masculino',
+  },
+  {
+    value: 'F',
+    label: 'Femenino',
+  }
+]
 
 export const FormCovid = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -354,6 +372,50 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="genero"
+                          options={generos}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('genero', value) }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="genero"
+                              variant="outlined"
+                              label="Selecciona un genero"
+                              error={Boolean(touched.genero && errors.genero?.label)}
+                              helperText={touched.genero && errors.genero?.label}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+
+                    {/* <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <TextField
+                          autoComplete='off'
+                          error={Boolean(touched.lugar_trabajo && errors.lugar_trabajo)}
+                          fullWidth
+                          helperText={touched.lugar_trabajo && errors.lugar_trabajo}
+                          label="Lugar de Trabajo"
+                          name="lugar_trabajo"
+                          type="text"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.lugar_trabajo}
+                          variant="outlined"
+                        />
+                      </Box>
+                    </Grid> */}
                   </Grid>
       
                 </CardContent>
