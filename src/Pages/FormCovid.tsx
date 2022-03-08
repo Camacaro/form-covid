@@ -18,6 +18,7 @@ import { useSintoma } from '../hooks/useSintoma';
 import { usehistorialClinico } from '../hooks/usehistorialClinico';
 import { metodoDiagnostico } from '../data/metodoDiagnostico';
 import { motivosPrueba, motivoPrueba } from '../data/motivoPrueba';
+import { useSucursales } from '../hooks/useSucursales';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -46,8 +47,11 @@ const initialValues = {
   segundo_apellido_paciente: '',
   correo_electronico: '',
   edad: '',
-  // sucursal: '',
-  // nacionalidad: '',
+  nacionalidad: {
+    // id: '',
+    value: '',
+    label: ''
+  },
   // tipo_identificacion: '',
   identificacion: '',
   // fechaNacimiento: '',
@@ -95,6 +99,11 @@ const initialValues = {
   fecha_viaje: '',
   pais_destino: {
     id: '',
+    value: '',
+    label: ''
+  },
+  sucursal: {
+    // id: '',
     value: '',
     label: ''
   }
@@ -182,6 +191,16 @@ const validationSchema = Yup.object().shape({
       })
     )
     .required('Sintomas es requerido'),
+  sucursal: Yup.object({
+    // id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
+  nacionalidad: Yup.object({
+    // id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  })
 })
 
 const generos = [
@@ -205,6 +224,7 @@ export const FormCovid = () => {
   const { paises } = usePaises();
   const { sintomas } = useSintoma()
   const { listaHistorial } = usehistorialClinico();
+  const { sucursales } = useSucursales()
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
@@ -373,6 +393,56 @@ export const FormCovid = () => {
                           onChange={handleChange}
                           value={values.segundo_apellido_paciente}
                           variant="outlined"
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="sucursal"
+                          options={sucursales}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('sucursal', value) }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="sucursal"
+                              variant="outlined"
+                              label="Selecciona una sucursal"
+                              error={Boolean(touched.sucursal && errors.sucursal?.label)}
+                              helperText={touched.sucursal && errors.sucursal?.label}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="nacionalidad"
+                          options={paises}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('nacionalidad', value) }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="nacionalidad"
+                              variant="outlined"
+                              label="Selecciona nacionalidad"
+                              error={Boolean(touched.nacionalidad && errors.nacionalidad?.label)}
+                              helperText={touched.nacionalidad && errors.nacionalidad?.label}
+                              fullWidth                        
+                            />
+                          )}
                         />
                       </Box>
                     </Grid>
