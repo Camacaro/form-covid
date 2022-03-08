@@ -10,16 +10,29 @@ import TimePicker from '@mui/lab/TimePicker';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns'
+import { useDirection } from '../hooks/useDirection';
 
 const initialValues = {
   fecha_muestra: new Date(),
 
   // // infoDireccion
-  // codigo_provincia: '',
-  // codigo_canton: '',
-  // codigo_distrito: '',
+  provincia: {
+    id: '',
+    value: '',
+    label: ''
+  },
+  canton: {
+    id: '',
+    value: '',
+    label: ''
+  },
+  distrito: {
+    id: '',
+    value: '',
+    label: ''
+  },
   // direccion_exacta: '',
 
   // // infoPersonal
@@ -80,6 +93,21 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+  provincia: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
+  canton: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
+  distrito: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  })
 })
 
 const generos = [
@@ -94,12 +122,24 @@ const generos = [
 ]
 
 export const FormCovid = () => {
+  const [idProvincia, setIdProvincia] = useState('')
+  const [idCanton, setIdCanton] = useState('')
+
   const [isLoading, setIsLoading] = useState(false)
+  const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
   //   setValue(newValue);
   // };
+
+  useEffect(() => {
+    if(idProvincia) onSelectProvincia(idProvincia)
+  }, [idProvincia])
+
+  useEffect(() => {
+    if(idCanton) onSelectCanton(idCanton)
+  }, [idCanton])
 
   const onSubmit: any = async (values: {}, formikHelpers: FormikHelpers<{}>) => {
     try {
@@ -399,23 +439,90 @@ export const FormCovid = () => {
                       </Box>
                     </Grid>
 
-                    {/* <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6}>
                       <Box marginY={1} >
-                        <TextField
-                          autoComplete='off'
-                          error={Boolean(touched.lugar_trabajo && errors.lugar_trabajo)}
-                          fullWidth
-                          helperText={touched.lugar_trabajo && errors.lugar_trabajo}
-                          label="Lugar de Trabajo"
-                          name="lugar_trabajo"
-                          type="text"
+                        <Autocomplete 
+                          id="provincia"
+                          options={provincias}
+                          getOptionLabel={(option) => option.label}
+                          itemID="id"
                           onBlur={handleBlur}
-                          onChange={handleChange}
-                          value={values.lugar_trabajo}
-                          variant="outlined"
+                          onChange={(e, value) => {
+                            if(value) setIdProvincia(value.id);
+                            setFieldValue('provincia', value)
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="provincia"
+                              variant="outlined"
+                              label="Selecciona una provincia"
+                              error={Boolean(touched.provincia && errors.provincia?.label)}
+                              helperText={touched.provincia && errors.provincia?.label}
+                              fullWidth                        
+                            />
+                          )}
                         />
                       </Box>
-                    </Grid> */}
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="canton"
+                          key={idProvincia} // Esto reinica el autocomplete
+                          options={cantones}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          noOptionsText={ idProvincia ? 'No encontrado' : 'Selecciona una provincia primero' }
+                          onChange={(e, value) => {
+                            if(value) setIdCanton(value.id);
+                            setFieldValue('canton', value) 
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="canton"
+                              variant="outlined"
+                              label="Selecciona un canton"
+                              error={Boolean(touched.canton && errors.canton?.label)}
+                              helperText={touched.canton && errors.canton?.label}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="distrito"
+                          key={idCanton} // Esto reinica el autocomplete
+                          options={distritos}
+                          noOptionsText={ idCanton ? 'No encontrado' : 'Selecciona un canton primero' }
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('distrito', value) }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="distrito"
+                              variant="outlined"
+                              label="Selecciona un distrito"
+                              error={Boolean(touched.distrito && errors.distrito?.label)}
+                              helperText={touched.distrito && errors.distrito?.label}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
                   </Grid>
       
                 </CardContent>
