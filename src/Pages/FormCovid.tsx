@@ -114,7 +114,7 @@ const initialValues = {
 const validationSchema = Yup.object().shape({
   fecha_muestra: Yup.date().required('Fecha de muestra es requerida'),
   // TODO Require opcional con el viaje_realizado
-  fecha_visita: Yup.date().required('Fecha de visita es requerida'),
+  
   correo_electronico: Yup.string().email('Correo electrónico inválido').required('Correo electrónico es requerido'),
   nombre_paciente: Yup.string().required('Nombre es requerido'),
   primer_apellido_paciente: Yup.string().required('Primer apellido es requerido'),
@@ -125,7 +125,6 @@ const validationSchema = Yup.object().shape({
   ocupacion: Yup.string().required('Ocupación es requerido'),
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
-  viaje_realizado: Yup.boolean(),
   contacto_caso_confirmado: Yup.boolean(),
 
   // TODO Require opcional con el contacto_caso_confirmado
@@ -158,12 +157,6 @@ const validationSchema = Yup.object().shape({
     label: Yup.string().required('Nombre es requerida'),
   }),
   distrito: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  // TODO Require opcional con el viaje_realizado
-  lugar_visitado: Yup.object({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
@@ -203,6 +196,27 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+
+  /** Ha realizado un viaje en los últimos 14 días */
+  viaje_realizado: Yup.boolean(),
+  lugar_visitado: Yup.object({
+    id: Yup.string(),
+    value: Yup.string(),
+    label: Yup.string(),
+  }).when('viaje_realizado', {
+    is: true,
+    then: Yup.object({
+      id: Yup.string().required('ID es requerido'),
+      value: Yup.string().required('Valor es requerido'),
+      label: Yup.string().required('Lugar visitado requerido'),
+    }),
+  }),
+  fecha_visita: Yup.date()
+    .when('viaje_realizado', {
+      is: true,
+      then: Yup.date().required('Fecha de visita es requerida'),
+    }),
+
 
   /** Pais destino */
   motivo_prueba: Yup.string().required('Motivo de prueba es requerido'),
@@ -1106,15 +1120,19 @@ export const FormCovid = () => {
             </Grid>
           </Grid> 
 
+          
+
+
+
           <Box mt={3}>
             <pre>
-              {JSON.stringify(errors.motivo_prueba, null, 2)}
+              {JSON.stringify(errors.viaje_realizado, null, 2)}
             </pre>
             <pre>
-              {JSON.stringify(errors.pais_destino, null, 2)}
+              {JSON.stringify(errors.lugar_visitado, null, 2)}
             </pre>
             <pre>
-              {JSON.stringify(errors.fecha_viaje, null, 2)}
+              {JSON.stringify(errors.fecha_visita, null, 2)}
             </pre>
           </Box>    
 
