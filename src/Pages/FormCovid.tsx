@@ -19,6 +19,7 @@ import { usehistorialClinico } from '../hooks/usehistorialClinico';
 import { metodoDiagnostico } from '../data/metodoDiagnostico';
 import { motivosPrueba, motivoPrueba } from '../data/motivoPrueba';
 import { useSucursales } from '../hooks/useSucursales';
+import { useTipoIdentificacion } from '../hooks/useTipoIdentificacion';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -52,7 +53,11 @@ const initialValues = {
     value: '',
     label: ''
   },
-  // tipo_identificacion: '',
+  tipo_identificacion:  {
+    id: '',
+    value: '',
+    label: ''
+  },
   identificacion: '',
   // fechaNacimiento: '',
   telefono: '',
@@ -103,7 +108,7 @@ const initialValues = {
     label: ''
   },
   sucursal: {
-    // id: '',
+    id: '',
     value: '',
     label: ''
   }
@@ -192,15 +197,20 @@ const validationSchema = Yup.object().shape({
     )
     .required('Sintomas es requerido'),
   sucursal: Yup.object({
-    // id: Yup.string().required('ID es requerido'),
+    id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
   nacionalidad: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
+  tipo_identificacion: Yup.object({
     // id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
-  })
+  }),
 })
 
 const generos = [
@@ -225,6 +235,8 @@ export const FormCovid = () => {
   const { sintomas } = useSintoma()
   const { listaHistorial } = usehistorialClinico();
   const { sucursales } = useSucursales()
+  const { tiposIdentificacion } = useTipoIdentificacion()
+
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
@@ -469,6 +481,32 @@ export const FormCovid = () => {
 
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
+                        <Autocomplete 
+                          id="tipo_identificacion"
+                          options={tiposIdentificacion}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('tipo_identificacion', value) }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="tipo_identificacion"
+                              variant="outlined"
+                              label="Tipo de identificación"
+                              error={Boolean(touched.tipo_identificacion && errors.tipo_identificacion?.label)}
+                              helperText={touched.tipo_identificacion && errors.tipo_identificacion?.label}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
                         <TextField
                           autoComplete='off'
                           error={Boolean(touched.edad && errors.edad)}
@@ -484,9 +522,7 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
-                  </Grid>
 
-                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <TextField
@@ -504,7 +540,9 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
+                  </Grid>
 
+                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <TextField
@@ -522,9 +560,7 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
-                  </Grid>
 
-                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <TextField
@@ -542,7 +578,9 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
+                  </Grid>
 
+                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <TextField
@@ -560,9 +598,7 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
-                  </Grid>
 
-                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <Autocomplete 
@@ -586,7 +622,9 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
+                  </Grid>
 
+                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <Autocomplete 
@@ -614,9 +652,7 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
-                  </Grid>
 
-                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <Autocomplete 
@@ -645,7 +681,9 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
+                  </Grid>
 
+                  <Grid container spacing={3} >
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <Autocomplete 
@@ -671,9 +709,7 @@ export const FormCovid = () => {
                         />
                       </Box>
                     </Grid>
-                  </Grid>
-
-                  <Grid container spacing={3} >
+                    
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <TextField
