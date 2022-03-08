@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button, Autocomplete } from '@mui/material';
+import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
 import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { Page } from '../components/Page';
@@ -13,6 +13,7 @@ import MobileDatePicker from '@mui/lab/MobileDatePicker';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns'
 import { useDirection } from '../hooks/useDirection';
+import { usePaises } from '../hooks/usePaises';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -56,9 +57,13 @@ const initialValues = {
   },
 
   // // viajeRealizado
-  // viaje_realizado: false,
-  // lugar_visitado: '',
-  // fecha_visita: '',
+  viaje_realizado: false,
+  lugar_visitado: {
+    id: '',
+    value: '',
+    label: ''
+  },
+  fecha_visita: '',
 
   // // contactoCaso 
   // contacto_caso_confirmado: false,
@@ -80,6 +85,8 @@ const initialValues = {
 
 const validationSchema = Yup.object().shape({
   fecha_muestra: Yup.date().required('Fecha de muestra es requerida'),
+  // TODO Require opcional con el viaje_realizado
+  fecha_visita: Yup.date().required('Fecha de visita es requerida'),
   correo_electronico: Yup.string().email('Correo electrónico inválido').required('Correo electrónico es requerido'),
   nombre_paciente: Yup.string().required('Nombre es requerido'),
   primer_apellido_paciente: Yup.string().required('Primer apellido es requerido'),
@@ -90,6 +97,7 @@ const validationSchema = Yup.object().shape({
   ocupacion: Yup.string().required('Ocupación es requerido'),
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
+  viaje_realizado: Yup.boolean(),
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
@@ -108,7 +116,13 @@ const validationSchema = Yup.object().shape({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
-  })
+  }),
+  // TODO Require opcional con el viaje_realizado
+  lugar_visitado: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
 })
 
 const generos = [
@@ -127,7 +141,9 @@ export const FormCovid = () => {
   const [idCanton, setIdCanton] = useState('')
 
   const [isLoading, setIsLoading] = useState(false)
+
   const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
+  const { paises } = usePaises();
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
@@ -544,6 +560,69 @@ export const FormCovid = () => {
                       </Box>
                     </Grid>
                   </Grid>
+
+                  <Box marginY={1} >
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={values.viaje_realizado}
+                          onChange={handleChange}
+                          value={values.viaje_realizado}
+                          name="viaje_realizado"
+                        />
+                      )}
+                      label="¿Ha realizado un viaje en los últimos 14 días?"
+                    />
+                  </Box>
+
+                  {values.viaje_realizado && (
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <Autocomplete 
+                            id="lugar_visitado"
+                            options={paises}
+                            getOptionLabel={(option) => option.label}
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            onChange={(e, value) => setFieldValue('lugar_visitado', value)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                autoComplete='off'
+                                name="lugar_visitado"
+                                variant="outlined"
+                                label="Selecciona el lugar visitado"
+                                error={Boolean(touched.lugar_visitado && errors.lugar_visitado?.label)}
+                                helperText={touched.lugar_visitado && errors.lugar_visitado?.label}
+                                fullWidth                        
+                              />
+                            )}
+                          />
+                        </Box>
+                      </Grid>
+
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <Stack spacing={3}>
+                              <DesktopDatePicker
+                                label="Fecha de visita"
+                                inputFormat="MM/dd/yyyy"
+                                value={values.fecha_visita}
+                                onChange={value => setFieldValue('fecha_visita', value)}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </Stack>
+                          </LocalizationProvider>
+
+                          <FormHelperText error>
+                            {errors.fecha_visita}
+                          </FormHelperText>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  )}
       
                 </CardContent>
               </Card>
