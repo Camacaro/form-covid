@@ -125,13 +125,11 @@ const validationSchema = Yup.object().shape({
   ocupacion: Yup.string().required('Ocupación es requerido'),
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
-  contacto_caso_confirmado: Yup.boolean(),
 
-  // TODO Require opcional con el contacto_caso_confirmado
-  nombre_contacto_covid: Yup.string().required('Nombre de contacto es requerido'),
-  tipo_contacto: Yup.string().required('Tipo de contacto es requerido'),
-  fecha_primer_contacto: Yup.date().required('Fecha de primer contacto es requerida'),
-  fecha_ultimo_contacto: Yup.date().required('Fecha de último contacto es requerida'),
+  
+  
+  
+  
 
   presenta_sintomas: Yup.boolean(),
   // TODO Require opcional con el presenta_sintomas
@@ -196,6 +194,29 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+
+  /** contacto con caso confirmado por COVID-19 */
+  contacto_caso_confirmado: Yup.boolean(),
+  nombre_contacto_covid: Yup.string()
+    .when('contacto_caso_confirmado', {
+      is: true,
+      then: Yup.string().required('Nombre de contacto es requerido'),
+    }),
+  tipo_contacto: Yup.string()
+    .when('contacto_caso_confirmado', {
+      is: true,
+      then: Yup.string().required('Tipo de contacto es requerido'),
+    }),
+  fecha_primer_contacto: Yup.date()
+    .when('contacto_caso_confirmado', {
+      is: true,
+      then: Yup.date().required('Fecha de primer contacto es requerida'),
+    }),
+  fecha_ultimo_contacto: Yup.date()
+    .when('contacto_caso_confirmado', {
+      is: true,
+      then: Yup.date().required('Fecha de último contacto es requerida'),
+    }),
 
   /** Ha realizado un viaje en los últimos 14 días */
   viaje_realizado: Yup.boolean(),
@@ -1124,15 +1145,25 @@ export const FormCovid = () => {
 
 
 
+
+
+
+
           <Box mt={3}>
             <pre>
-              {JSON.stringify(errors.viaje_realizado, null, 2)}
+              {JSON.stringify(errors.contacto_caso_confirmado, null, 2)}
             </pre>
             <pre>
-              {JSON.stringify(errors.lugar_visitado, null, 2)}
+              {JSON.stringify(errors.nombre_contacto_covid, null, 2)}
             </pre>
             <pre>
-              {JSON.stringify(errors.fecha_visita, null, 2)}
+              {JSON.stringify(errors.tipo_contacto, null, 2)}
+            </pre>
+            <pre>
+              {JSON.stringify(errors.fecha_primer_contacto, null, 2)}
+            </pre>
+            <pre>
+              {JSON.stringify(errors.fecha_ultimo_contacto, null, 2)}
             </pre>
           </Box>    
 
