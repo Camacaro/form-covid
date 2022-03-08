@@ -15,6 +15,8 @@ import { format } from 'date-fns'
 import { useDirection } from '../hooks/useDirection';
 import { usePaises } from '../hooks/usePaises';
 import { useSintoma } from '../hooks/useSintoma';
+import { usehistorialClinico } from '../hooks/usehistorialClinico';
+import { metodoDiagnostico } from '../data/metodoDiagnostico';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -83,6 +85,10 @@ const initialValues = {
   // // estadoEmbarazo
   // estado_embarazo: '',
   // semanas_embarazo: '',
+
+  historial_clinico: [],
+
+  metodo_diagnostico: '',
 }
 
 const validationSchema = Yup.object().shape({
@@ -113,6 +119,7 @@ const validationSchema = Yup.object().shape({
   fecha_inicio_sintomas: Yup.date().required('Fecha de inicio de sintomas es requerida'),
   otros_sintomas: Yup.string(),
 
+  metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
 
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
@@ -149,6 +156,15 @@ const validationSchema = Yup.object().shape({
       })
     )
     .required('Sintomas es requerido'),
+  historial_clinico: Yup.array()
+    .of(
+      Yup.object().shape({
+        id: Yup.string().required('ID es requerido'),
+        value: Yup.string().required('Valor es requerido'),
+        label: Yup.string().required('Nombre es requerida'),
+      })
+    )
+    .required('Sintomas es requerido'),
 })
 
 const generos = [
@@ -171,6 +187,7 @@ export const FormCovid = () => {
   const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
   const { paises } = usePaises();
   const { sintomas } = useSintoma()
+  const { listaHistorial } = usehistorialClinico();
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
@@ -831,6 +848,57 @@ export const FormCovid = () => {
                       </Grid>
                     </>
                   )}
+
+                   <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          multiple
+                          filterSelectedOptions
+                          id="historial_clinico"
+                          options={listaHistorial}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('historial_clinico', value)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="historial_clinico"
+                              variant="outlined"
+                              label="Historial clínico"
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="metodo_diagnostico"
+                          options={metodoDiagnostico}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('metodo_diagnostico', value || '') }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="metodo_diagnostico"
+                              variant="outlined"
+                              label="Selecciona un metodo diagnostico"
+                              error={Boolean(touched.metodo_diagnostico && errors.metodo_diagnostico)}
+                              helperText={touched.metodo_diagnostico && errors.metodo_diagnostico}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+
       
                 </CardContent>
               </Card>
