@@ -622,6 +622,122 @@ export const FormCovid = () => {
                     </Grid>
                   </Grid>
 
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          multiple
+                          filterSelectedOptions
+                          id="historial_clinico"
+                          options={listaHistorial}
+                          getOptionLabel={(option) => option.label}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('historial_clinico', value)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="historial_clinico"
+                              variant="outlined"
+                              label="Historial clínico"
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="metodo_diagnostico"
+                          options={metodoDiagnostico}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('metodo_diagnostico', value || '') }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="metodo_diagnostico"
+                              variant="outlined"
+                              label="Selecciona un metodo diagnostico"
+                              error={Boolean(touched.metodo_diagnostico && errors.metodo_diagnostico)}
+                              helperText={touched.metodo_diagnostico && errors.metodo_diagnostico}
+                              fullWidth                        
+                            />
+                          )}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  <Box marginY={1} >
+                    <Autocomplete 
+                      id="motivo_prueba"
+                      options={motivosPrueba}
+                      onBlur={handleBlur}
+                      onChange={(e, value) => setFieldValue('motivo_prueba', value)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          autoComplete='off'
+                          name="motivo_prueba"
+                          variant="outlined"
+                          label="Motivo de realizar la prueba"
+                          fullWidth                        
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  {values.motivo_prueba === motivoPrueba.VIAJE && (
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <Autocomplete 
+                            id="pais_destino"
+                            options={paises}
+                            getOptionLabel={(option) => option.label}
+                            onBlur={handleBlur}
+                            onChange={(e, value) => setFieldValue('pais_destino', value)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                autoComplete='off'
+                                name="pais_destino"
+                                variant="outlined"
+                                label="Selecciona el pais destino"
+                                error={Boolean(touched.pais_destino && errors.pais_destino?.label)}
+                                helperText={touched.pais_destino && errors.pais_destino?.label}
+                                fullWidth                        
+                              />
+                            )}
+                          />
+                        </Box>
+                      </Grid>
+
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <Stack spacing={3}>
+                              <DesktopDatePicker
+                                label="Fecha de viaje"
+                                inputFormat="MM/dd/yyyy"
+                                value={values.fecha_viaje}
+                                onChange={value => setFieldValue('fecha_viaje', value)}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </Stack>
+                          </LocalizationProvider>
+
+                          <FormHelperText error>
+                            {errors.fecha_viaje}
+                          </FormHelperText>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  )}
+
                   <Box marginY={1} >
                     <FormControlLabel
                       control={(
@@ -865,124 +981,6 @@ export const FormCovid = () => {
                       </Grid>
                     </>
                   )}
-
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Box marginY={1} >
-                        <Autocomplete 
-                          multiple
-                          filterSelectedOptions
-                          id="historial_clinico"
-                          options={listaHistorial}
-                          getOptionLabel={(option) => option.label}
-                          onBlur={handleBlur}
-                          onChange={(e, value) => setFieldValue('historial_clinico', value)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              autoComplete='off'
-                              name="historial_clinico"
-                              variant="outlined"
-                              label="Historial clínico"
-                              fullWidth                        
-                            />
-                          )}
-                        />
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Box marginY={1} >
-                        <Autocomplete 
-                          id="metodo_diagnostico"
-                          options={metodoDiagnostico}
-                          onBlur={handleBlur}
-                          onChange={(e, value) => setFieldValue('metodo_diagnostico', value || '') }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              autoComplete='off'
-                              name="metodo_diagnostico"
-                              variant="outlined"
-                              label="Selecciona un metodo diagnostico"
-                              error={Boolean(touched.metodo_diagnostico && errors.metodo_diagnostico)}
-                              helperText={touched.metodo_diagnostico && errors.metodo_diagnostico}
-                              fullWidth                        
-                            />
-                          )}
-                        />
-                      </Box>
-                    </Grid>
-                  </Grid>
-
-                  <Box marginY={1} >
-                    <Autocomplete 
-                      id="motivo_prueba"
-                      options={motivosPrueba}
-                      onBlur={handleBlur}
-                      onChange={(e, value) => setFieldValue('motivo_prueba', value)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          autoComplete='off'
-                          name="motivo_prueba"
-                          variant="outlined"
-                          label="Motivo de realizar la prueba"
-                          fullWidth                        
-                        />
-                      )}
-                    />
-                  </Box>
-
-                  {values.motivo_prueba === motivoPrueba.VIAJE && (
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} md={6}>
-                        <Box marginY={1} >
-                          <Autocomplete 
-                            id="pais_destino"
-                            options={paises}
-                            getOptionLabel={(option) => option.label}
-                            onBlur={handleBlur}
-                            onChange={(e, value) => setFieldValue('pais_destino', value)}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                autoComplete='off'
-                                name="pais_destino"
-                                variant="outlined"
-                                label="Selecciona el pais destino"
-                                error={Boolean(touched.pais_destino && errors.pais_destino?.label)}
-                                helperText={touched.pais_destino && errors.pais_destino?.label}
-                                fullWidth                        
-                              />
-                            )}
-                          />
-                        </Box>
-                      </Grid>
-
-                      <Grid item xs={12} md={6}>
-                        <Box marginY={1} >
-                          <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <Stack spacing={3}>
-                              <DesktopDatePicker
-                                label="Fecha de viaje"
-                                inputFormat="MM/dd/yyyy"
-                                value={values.fecha_viaje}
-                                onChange={value => setFieldValue('fecha_viaje', value)}
-                                renderInput={(params) => <TextField {...params} />}
-                              />
-                            </Stack>
-                          </LocalizationProvider>
-
-                          <FormHelperText error>
-                            {errors.fecha_viaje}
-                          </FormHelperText>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  )}
-
-
       
                 </CardContent>
               </Card>
