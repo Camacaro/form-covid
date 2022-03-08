@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns'
 import { useDirection } from '../hooks/useDirection';
 import { usePaises } from '../hooks/usePaises';
+import { useSintoma } from '../hooks/useSintoma';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -66,17 +67,18 @@ const initialValues = {
   fecha_visita: '',
 
   // // contactoCaso 
-  // contacto_caso_confirmado: false,
-  // nombre_contacto_covid: '',
-  // tipo_contacto: '',
-  // fecha_primer_contacto: '',
-  // fecha_ultimo_contacto: '',
+  contacto_caso_confirmado: false,
+  nombre_contacto_covid: '',
+  tipo_contacto: '',
+  fecha_primer_contacto: '',
+  fecha_ultimo_contacto: '',
 
   // // sintomas
+  presenta_sintomas: false,
   // presenta_sintomas: '',
-  // sintomas: [],
-  // fecha_inicio_sintomas: '',
-  // otros_sintomas: '',
+  sintomas: [],
+  fecha_inicio_sintomas: '',
+  otros_sintomas: '',
 
   // // estadoEmbarazo
   // estado_embarazo: '',
@@ -98,6 +100,20 @@ const validationSchema = Yup.object().shape({
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
   viaje_realizado: Yup.boolean(),
+  contacto_caso_confirmado: Yup.boolean(),
+
+  // TODO Require opcional con el contacto_caso_confirmado
+  nombre_contacto_covid: Yup.string().required('Nombre de contacto es requerido'),
+  tipo_contacto: Yup.string().required('Tipo de contacto es requerido'),
+  fecha_primer_contacto: Yup.date().required('Fecha de primer contacto es requerida'),
+  fecha_ultimo_contacto: Yup.date().required('Fecha de último contacto es requerida'),
+
+  presenta_sintomas: Yup.boolean(),
+  // TODO Require opcional con el presenta_sintomas
+  fecha_inicio_sintomas: Yup.date().required('Fecha de inicio de sintomas es requerida'),
+  otros_sintomas: Yup.string(),
+
+
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
@@ -123,6 +139,16 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+  // TODO Require opcional con el presenta_sintomas
+  sintomas: Yup.array()
+    .of(
+      Yup.object().shape({
+        id: Yup.string().required('ID es requerido'),
+        value: Yup.string().required('Valor es requerido'),
+        label: Yup.string().required('Nombre es requerida'),
+      })
+    )
+    .required('Sintomas es requerido'),
 })
 
 const generos = [
@@ -144,6 +170,7 @@ export const FormCovid = () => {
 
   const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
   const { paises } = usePaises();
+  const { sintomas } = useSintoma()
   // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
 
   // const handleChange = (newValue: any) => {
@@ -584,7 +611,6 @@ export const FormCovid = () => {
                             options={paises}
                             getOptionLabel={(option) => option.label}
                             onBlur={handleBlur}
-                            onChange={handleChange}
                             onChange={(e, value) => setFieldValue('lugar_visitado', value)}
                             renderInput={(params) => (
                               <TextField
@@ -622,6 +648,188 @@ export const FormCovid = () => {
                         </Box>
                       </Grid>
                     </Grid>
+                  )}
+
+                  <Box marginY={1} >
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={values.contacto_caso_confirmado}
+                          onChange={handleChange}
+                          value={values.contacto_caso_confirmado}
+                          name="contacto_caso_confirmado"
+                        />
+                      )}
+                      label="¿Ha tenido contacto con caso confirmado por COVID-19?"
+                    />
+                  </Box>
+
+                  {values.contacto_caso_confirmado && (
+                    <>
+                      <Grid container spacing={3} >
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.nombre_contacto_covid && errors.nombre_contacto_covid)}
+                              fullWidth
+                              helperText={touched.nombre_contacto_covid && errors.nombre_contacto_covid}
+                              label="Nombre del contacto"
+                              name="nombre_contacto_covid"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.nombre_contacto_covid}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.tipo_contacto && errors.tipo_contacto)}
+                              fullWidth
+                              helperText={touched.tipo_contacto && errors.tipo_contacto}
+                              label="Tipo de contacto"
+                              name="tipo_contacto"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.tipo_contacto}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <Stack spacing={3}>
+                                <DesktopDatePicker
+                                  label="Desde cuando"
+                                  inputFormat="MM/dd/yyyy"
+                                  value={values.fecha_primer_contacto}
+                                  onChange={value => setFieldValue('fecha_primer_contacto', value)}
+                                  renderInput={(params) => <TextField {...params} />}
+                                />
+                              </Stack>
+                            </LocalizationProvider>
+
+                            <FormHelperText error>
+                              {errors.fecha_primer_contacto}
+                            </FormHelperText>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <Stack spacing={3}>
+                                <DesktopDatePicker
+                                  label="Hasta cuando"
+                                  inputFormat="MM/dd/yyyy"
+                                  value={values.fecha_ultimo_contacto}
+                                  onChange={value => setFieldValue('fecha_ultimo_contacto', value)}
+                                  renderInput={(params) => <TextField {...params} />}
+                                />
+                              </Stack>
+                            </LocalizationProvider>
+
+                            <FormHelperText error>
+                              {errors.fecha_ultimo_contacto}
+                            </FormHelperText>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </>
+                  )}
+
+                  <Box marginY={1} >
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={values.presenta_sintomas}
+                          onChange={handleChange}
+                          value={values.presenta_sintomas}
+                          name="presenta_sintomas"
+                        />
+                      )}
+                      label="¿Presenta síntomas relacionados con el COVID-19?"
+                    />
+                  </Box>
+
+                  {values.presenta_sintomas && (
+                    <>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <Autocomplete 
+                              multiple
+                              id="sintomas"
+                              options={sintomas}
+                              getOptionLabel={(option) => option.label}
+                              onBlur={handleBlur}
+                              onChange={(e, value) => setFieldValue('sintomas', value)}
+                              filterSelectedOptions
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  autoComplete='off'
+                                  name="sintomas"
+                                  variant="outlined"
+                                  label="Selecciona Sintomas"
+                                  fullWidth                        
+                                />
+                              )}
+                            />
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <Stack spacing={3}>
+                                <DesktopDatePicker
+                                  label="Fecha de inicio de síntomas"
+                                  inputFormat="MM/dd/yyyy"
+                                  value={values.fecha_inicio_sintomas}
+                                  onChange={value => setFieldValue('fecha_inicio_sintomas', value)}
+                                  renderInput={(params) => <TextField {...params} />}
+                                />
+                              </Stack>
+                            </LocalizationProvider>
+
+                            <FormHelperText error>
+                              {errors.fecha_inicio_sintomas}
+                            </FormHelperText>
+                          </Box>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container spacing={3} >
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.otros_sintomas && errors.otros_sintomas)}
+                              fullWidth
+                              helperText={touched.otros_sintomas && errors.otros_sintomas}
+                              label="Otros síntomas"
+                              name="otros_sintomas"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.otros_sintomas}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </>
                   )}
       
                 </CardContent>
