@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
 import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
@@ -6,11 +7,7 @@ import { Page } from '../components/Page';
 import Stack from '@mui/material/Stack';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import TimePicker from '@mui/lab/TimePicker';
-import DateTimePicker from '@mui/lab/DateTimePicker';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-import MobileDatePicker from '@mui/lab/MobileDatePicker';
-import { useState, useEffect } from 'react';
 import { format } from 'date-fns'
 import { useDirection } from '../hooks/useDirection';
 import { usePaises } from '../hooks/usePaises';
@@ -142,10 +139,9 @@ const validationSchema = Yup.object().shape({
   fecha_inicio_sintomas: Yup.date().required('Fecha de inicio de sintomas es requerida'),
   otros_sintomas: Yup.string(),
 
-  fecha_viaje: Yup.date().required('Fecha de viaje es requerida'),
+  
 
   metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
-  motivo_prueba: Yup.string().required('Motivo de prueba es requerido'),
 
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
@@ -172,11 +168,7 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
-  pais_destino: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
+  
   // TODO Require opcional con el presenta_sintomas
   sintomas: Yup.array()
     .of(
@@ -211,6 +203,26 @@ const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+
+  /** Pais destino */
+  motivo_prueba: Yup.string().required('Motivo de prueba es requerido'),
+  pais_destino: Yup.object({
+    id: Yup.string(),
+    value: Yup.string(),
+    label: Yup.string(),
+  }).when('motivo_prueba', {
+    is: motivoPrueba.VIAJE,
+    then: Yup.object({
+      id: Yup.string().required('ID es requerido'),
+      value: Yup.string().required('Valor es requerido'),
+      label: Yup.string().required('País destino requerido'),
+    }),
+  }),
+  fecha_viaje: Yup.date()
+    .when('motivo_prueba', {
+      is: motivoPrueba.VIAJE,
+      then: Yup.date().required('Fecha de viaje es requerida'),
+    }),
 })
 
 const generos = [
@@ -1092,7 +1104,19 @@ export const FormCovid = () => {
               </Card>
 
             </Grid>
-          </Grid>     
+          </Grid> 
+
+          <Box mt={3}>
+            <pre>
+              {JSON.stringify(errors.motivo_prueba, null, 2)}
+            </pre>
+            <pre>
+              {JSON.stringify(errors.pais_destino, null, 2)}
+            </pre>
+            <pre>
+              {JSON.stringify(errors.fecha_viaje, null, 2)}
+            </pre>
+          </Box>    
 
           <Box mt={3}>
             {
