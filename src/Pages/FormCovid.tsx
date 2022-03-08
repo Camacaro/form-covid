@@ -17,6 +17,7 @@ import { usePaises } from '../hooks/usePaises';
 import { useSintoma } from '../hooks/useSintoma';
 import { usehistorialClinico } from '../hooks/usehistorialClinico';
 import { metodoDiagnostico } from '../data/metodoDiagnostico';
+import { motivosPrueba, motivoPrueba } from '../data/motivoPrueba';
 
 const initialValues = {
   fecha_muestra: new Date(),
@@ -89,6 +90,14 @@ const initialValues = {
   historial_clinico: [],
 
   metodo_diagnostico: '',
+  motivo_prueba: '',
+  
+  fecha_viaje: '',
+  pais_destino: {
+    id: '',
+    value: '',
+    label: ''
+  }
 }
 
 const validationSchema = Yup.object().shape({
@@ -119,7 +128,10 @@ const validationSchema = Yup.object().shape({
   fecha_inicio_sintomas: Yup.date().required('Fecha de inicio de sintomas es requerida'),
   otros_sintomas: Yup.string(),
 
+  fecha_viaje: Yup.date().required('Fecha de viaje es requerida'),
+
   metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
+  motivo_prueba: Yup.string().required('Motivo de prueba es requerido'),
 
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
@@ -142,6 +154,11 @@ const validationSchema = Yup.object().shape({
   }),
   // TODO Require opcional con el viaje_realizado
   lugar_visitado: Yup.object({
+    id: Yup.string().required('ID es requerido'),
+    value: Yup.string().required('Valor es requerido'),
+    label: Yup.string().required('Nombre es requerida'),
+  }),
+  pais_destino: Yup.object({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
@@ -849,7 +866,7 @@ export const FormCovid = () => {
                     </>
                   )}
 
-                   <Grid container spacing={3} >
+                  <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                       <Box marginY={1} >
                         <Autocomplete 
@@ -897,6 +914,73 @@ export const FormCovid = () => {
                       </Box>
                     </Grid>
                   </Grid>
+
+                  <Box marginY={1} >
+                    <Autocomplete 
+                      id="motivo_prueba"
+                      options={motivosPrueba}
+                      onBlur={handleBlur}
+                      onChange={(e, value) => setFieldValue('motivo_prueba', value)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          autoComplete='off'
+                          name="motivo_prueba"
+                          variant="outlined"
+                          label="Motivo de realizar la prueba"
+                          fullWidth                        
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  {values.motivo_prueba === motivoPrueba.VIAJE && (
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <Autocomplete 
+                            id="pais_destino"
+                            options={paises}
+                            getOptionLabel={(option) => option.label}
+                            onBlur={handleBlur}
+                            onChange={(e, value) => setFieldValue('pais_destino', value)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                autoComplete='off'
+                                name="pais_destino"
+                                variant="outlined"
+                                label="Selecciona el pais destino"
+                                error={Boolean(touched.pais_destino && errors.pais_destino?.label)}
+                                helperText={touched.pais_destino && errors.pais_destino?.label}
+                                fullWidth                        
+                              />
+                            )}
+                          />
+                        </Box>
+                      </Grid>
+
+                      <Grid item xs={12} md={6}>
+                        <Box marginY={1} >
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <Stack spacing={3}>
+                              <DesktopDatePicker
+                                label="Fecha de viaje"
+                                inputFormat="MM/dd/yyyy"
+                                value={values.fecha_viaje}
+                                onChange={value => setFieldValue('fecha_viaje', value)}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </Stack>
+                          </LocalizationProvider>
+
+                          <FormHelperText error>
+                            {errors.fecha_viaje}
+                          </FormHelperText>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  )}
 
 
       
