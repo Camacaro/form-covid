@@ -1,0 +1,1 @@
+export const formattedDate = 'dd-MM-yyyy'; 

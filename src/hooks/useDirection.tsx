@@ -22,8 +22,7 @@ export const useDirection = () => {
   );
 
   const refreshDistritos = useCallback(
-    (idCanton: string) => {
-      console.log('buscando distritos')
+    (idCanton: string) => {      
       getDistritos(idCanton).then((data) => setDistritos(data))
     },
     [],

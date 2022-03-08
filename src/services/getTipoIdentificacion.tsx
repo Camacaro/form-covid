@@ -1,6 +1,6 @@
 import { BASE_URL_MIN_SALUD } from "../config";
 
-export interface IGetTipoIdentificacion {
+export interface ITipoIdentificacion {
   id: string;
   value: string;
   label: string;
@@ -9,11 +9,11 @@ export interface IGetTipoIdentificacion {
 export const getTipoIdentificacion = () => {
   const url = `${BASE_URL_MIN_SALUD}/tipo_identificacion`;
   const options = { method: 'GET' };
-  let data: IGetTipoIdentificacion[] = [];
+  let data: ITipoIdentificacion[] = [];
 
   return fetch(url, options)
     .then(res => res.json())
-    .then((json) => {
+    .then((json) => {      
       json.data.forEach((element: any) => {
         data.push({ 'value': `${element.id}`, 'label': element.name, id: element.id });
       });

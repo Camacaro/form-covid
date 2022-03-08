@@ -1,275 +1,39 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Grid, TextField, CircularProgress, FormHelperText, Button, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
-import { Formik, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
-import { Page } from '../components/Page';
 
-import Stack from '@mui/material/Stack';
+import { 
+  Stack,
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  CircularProgress,
+  FormHelperText,
+  Button,
+  Autocomplete,
+  FormControlLabel,
+  Checkbox ,
+} from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+
+import { Formik, FormikHelpers } from 'formik';
 import { format } from 'date-fns'
-import { useDirection } from '../hooks/useDirection';
-import { usePaises } from '../hooks/usePaises';
-import { useSintoma } from '../hooks/useSintoma';
-import { usehistorialClinico } from '../hooks/usehistorialClinico';
+
+import { IInitialValues, initialValues } from '../utils/initialValues';
 import { metodoDiagnostico } from '../data/metodoDiagnostico';
 import { motivosPrueba, motivoPrueba } from '../data/motivoPrueba';
+import { Page } from '../components/Page';
+import { useDirection } from '../hooks/useDirection';
+import { usehistorialClinico } from '../hooks/usehistorialClinico';
+import { usePaises } from '../hooks/usePaises';
+import { useSintoma } from '../hooks/useSintoma';
 import { useSucursales } from '../hooks/useSucursales';
 import { useTipoIdentificacion } from '../hooks/useTipoIdentificacion';
-
-const initialValues = {
-  fecha_muestra: new Date(),
-
-  // // infoDireccion
-  provincia: {
-    id: '',
-    value: '',
-    label: ''
-  },
-  canton: {
-    id: '',
-    value: '',
-    label: ''
-  },
-  distrito: {
-    id: '',
-    value: '',
-    label: ''
-  },
-  direccion_exacta: '',
-
-  // // infoPersonal
-  nombre_paciente: '',
-  primer_apellido_paciente: '',
-  segundo_apellido_paciente: '',
-  correo_electronico: '',
-  edad: '',
-  nacionalidad: {
-    // id: '',
-    value: '',
-    label: ''
-  },
-  tipo_identificacion:  {
-    id: '',
-    value: '',
-    label: ''
-  },
-  identificacion: '',
-  // fechaNacimiento: '',
-  telefono: '',
-  telefono_adicional: '',
-  ocupacion: '',
-  lugar_trabajo: '',
-  genero: {
-    value: '',
-    label: ''
-  },
-
-  // // viajeRealizado
-  viaje_realizado: false,
-  lugar_visitado: {
-    id: '',
-    value: '',
-    label: ''
-  },
-  fecha_visita: '',
-
-  // // contactoCaso 
-  contacto_caso_confirmado: false,
-  nombre_contacto_covid: '',
-  tipo_contacto: '',
-  fecha_primer_contacto: '',
-  fecha_ultimo_contacto: '',
-
-  // // sintomas
-  presenta_sintomas: false,
-  // presenta_sintomas: '',
-  sintomas: [],
-  fecha_inicio_sintomas: '',
-  otros_sintomas: '',
-
-  // // estadoEmbarazo
-  // estado_embarazo: '',
-  // semanas_embarazo: '',
-
-  historial_clinico: [],
-
-  metodo_diagnostico: '',
-  motivo_prueba: '',
-  
-  fecha_viaje: '',
-  pais_destino: {
-    id: '',
-    value: '',
-    label: ''
-  },
-  sucursal: {
-    id: '',
-    value: '',
-    label: ''
-  }
-}
-
-const validationSchema = Yup.object().shape({
-  fecha_muestra: Yup.date().required('Fecha de muestra es requerida'),
-  // TODO Require opcional con el viaje_realizado
-  
-  correo_electronico: Yup.string().email('Correo electrónico inválido').required('Correo electrónico es requerido'),
-  nombre_paciente: Yup.string().required('Nombre es requerido'),
-  primer_apellido_paciente: Yup.string().required('Primer apellido es requerido'),
-  segundo_apellido_paciente: Yup.string().required('Segundo apellido es requerido'),
-  identificacion: Yup.string().required('Identificación es requerido'),
-  telefono: Yup.string().required('Teléfono es requerido'),
-  telefono_adicional: Yup.string().required('Teléfono adicional es requerido'),
-  ocupacion: Yup.string().required('Ocupación es requerido'),
-  lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
-  direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
-
-  
-  
-  
-  
-
-  presenta_sintomas: Yup.boolean(),
-  // TODO Require opcional con el presenta_sintomas
-  fecha_inicio_sintomas: Yup.date().required('Fecha de inicio de sintomas es requerida'),
-  otros_sintomas: Yup.string(),
-
-  
-
-  metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
-
-  genero: Yup.object({
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  provincia: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  canton: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  distrito: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  
-  // TODO Require opcional con el presenta_sintomas
-  sintomas: Yup.array()
-    .of(
-      Yup.object().shape({
-        id: Yup.string().required('ID es requerido'),
-        value: Yup.string().required('Valor es requerido'),
-        label: Yup.string().required('Nombre es requerida'),
-      })
-    )
-    .required('Sintomas es requerido'),
-  historial_clinico: Yup.array()
-    .of(
-      Yup.object().shape({
-        id: Yup.string().required('ID es requerido'),
-        value: Yup.string().required('Valor es requerido'),
-        label: Yup.string().required('Nombre es requerida'),
-      })
-    )
-    .required('Sintomas es requerido'),
-  sucursal: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  nacionalidad: Yup.object({
-    id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-  tipo_identificacion: Yup.object({
-    // id: Yup.string().required('ID es requerido'),
-    value: Yup.string().required('Valor es requerido'),
-    label: Yup.string().required('Nombre es requerida'),
-  }),
-
-  /** contacto con caso confirmado por COVID-19 */
-  contacto_caso_confirmado: Yup.boolean(),
-  nombre_contacto_covid: Yup.string()
-    .when('contacto_caso_confirmado', {
-      is: true,
-      then: Yup.string().required('Nombre de contacto es requerido'),
-    }),
-  tipo_contacto: Yup.string()
-    .when('contacto_caso_confirmado', {
-      is: true,
-      then: Yup.string().required('Tipo de contacto es requerido'),
-    }),
-  fecha_primer_contacto: Yup.date()
-    .when('contacto_caso_confirmado', {
-      is: true,
-      then: Yup.date().required('Fecha de primer contacto es requerida'),
-    }),
-  fecha_ultimo_contacto: Yup.date()
-    .when('contacto_caso_confirmado', {
-      is: true,
-      then: Yup.date().required('Fecha de último contacto es requerida'),
-    }),
-
-  /** Ha realizado un viaje en los últimos 14 días */
-  viaje_realizado: Yup.boolean(),
-  lugar_visitado: Yup.object({
-    id: Yup.string(),
-    value: Yup.string(),
-    label: Yup.string(),
-  }).when('viaje_realizado', {
-    is: true,
-    then: Yup.object({
-      id: Yup.string().required('ID es requerido'),
-      value: Yup.string().required('Valor es requerido'),
-      label: Yup.string().required('Lugar visitado requerido'),
-    }),
-  }),
-  fecha_visita: Yup.date()
-    .when('viaje_realizado', {
-      is: true,
-      then: Yup.date().required('Fecha de visita es requerida'),
-    }),
-
-
-  /** Pais destino */
-  motivo_prueba: Yup.string().required('Motivo de prueba es requerido'),
-  pais_destino: Yup.object({
-    id: Yup.string(),
-    value: Yup.string(),
-    label: Yup.string(),
-  }).when('motivo_prueba', {
-    is: motivoPrueba.VIAJE,
-    then: Yup.object({
-      id: Yup.string().required('ID es requerido'),
-      value: Yup.string().required('Valor es requerido'),
-      label: Yup.string().required('País destino requerido'),
-    }),
-  }),
-  fecha_viaje: Yup.date()
-    .when('motivo_prueba', {
-      is: motivoPrueba.VIAJE,
-      then: Yup.date().required('Fecha de viaje es requerida'),
-    }),
-})
-
-const generos = [
-  {
-    value: 'M',
-    label: 'Masculino',
-  },
-  {
-    value: 'F',
-    label: 'Femenino',
-  }
-]
+import { validationSchema } from '../utils/validationSchema';
+import { generos } from '../data/generos';
+import { formattedDate } from '../utils/constant';
 
 export const FormCovid = () => {
   const [idProvincia, setIdProvincia] = useState('')
@@ -284,12 +48,6 @@ export const FormCovid = () => {
   const { sucursales } = useSucursales()
   const { tiposIdentificacion } = useTipoIdentificacion()
 
-  // const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
-
-  // const handleChange = (newValue: any) => {
-  //   setValue(newValue);
-  // };
-
   useEffect(() => {
     if(idProvincia) onSelectProvincia(idProvincia)
   }, [idProvincia])
@@ -298,12 +56,34 @@ export const FormCovid = () => {
     if(idCanton) onSelectCanton(idCanton)
   }, [idCanton])
 
-  const onSubmit: any = async (values: {}, formikHelpers: FormikHelpers<{}>) => {
+  const onSubmit: any = async (values: IInitialValues, formikHelpers: FormikHelpers<{}>) => {
     try {
       console.log(values)
 
-      // fecha_muestra
-      // const date = format(value || new Date(), 'yyyy-MM-dd')
+      const {
+        fecha_muestra,
+        fecha_visita,
+        fecha_primer_contacto,
+        fecha_ultimo_contacto,
+        fecha_inicio_sintomas,
+        fecha_viaje,
+      } = values
+
+      const fecha_muestra_format = format( fecha_muestra as Date, formattedDate );
+      const fecha_visita_format = format( fecha_visita as Date, formattedDate );
+      const fecha_primer_contacto_format = format( fecha_primer_contacto as Date, formattedDate );
+      const fecha_ultimo_contacto_format = format( fecha_ultimo_contacto as Date, formattedDate );
+      const fecha_inicio_sintomas_format = format( fecha_inicio_sintomas as Date, formattedDate );
+      const fecha_viaje_format = format( fecha_viaje as Date, formattedDate );
+
+      console.log({
+        fecha_muestra_format,
+        fecha_visita_format,
+        fecha_primer_contacto_format,
+        fecha_ultimo_contacto_format,
+        fecha_inicio_sintomas_format,
+        fecha_viaje_format,
+      })
 
     } catch (err: any) {
       formikHelpers.resetForm();
@@ -793,7 +573,9 @@ export const FormCovid = () => {
                               name="historial_clinico"
                               variant="outlined"
                               label="Historial clínico"
-                              fullWidth                        
+                              fullWidth
+                              error={Boolean(touched.historial_clinico && values.historial_clinico.length < 1)}
+                              helperText={(touched.historial_clinico && values.historial_clinico.length < 1) ? 'Historial clínico es requerido' : ''}                          
                             />
                           )}
                         />
@@ -1085,7 +867,9 @@ export const FormCovid = () => {
                                   name="sintomas"
                                   variant="outlined"
                                   label="Selecciona Sintomas"
-                                  fullWidth                        
+                                  fullWidth
+                                  error={Boolean(values.sintomas.length < 1)}
+                                  helperText={values.sintomas.length < 1 ? 'Sintomas es requerido' : ''}             
                                 />
                               )}
                             />
@@ -1141,32 +925,6 @@ export const FormCovid = () => {
             </Grid>
           </Grid> 
 
-          
-
-
-
-
-
-
-
-          <Box mt={3}>
-            <pre>
-              {JSON.stringify(errors.contacto_caso_confirmado, null, 2)}
-            </pre>
-            <pre>
-              {JSON.stringify(errors.nombre_contacto_covid, null, 2)}
-            </pre>
-            <pre>
-              {JSON.stringify(errors.tipo_contacto, null, 2)}
-            </pre>
-            <pre>
-              {JSON.stringify(errors.fecha_primer_contacto, null, 2)}
-            </pre>
-            <pre>
-              {JSON.stringify(errors.fecha_ultimo_contacto, null, 2)}
-            </pre>
-          </Box>    
-
           <Box mt={3}>
             {
               isLoading 
@@ -1183,7 +941,6 @@ export const FormCovid = () => {
               )
             }
           </Box>       
-
         </form>
       )}
       </Formik>
