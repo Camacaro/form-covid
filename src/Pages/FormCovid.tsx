@@ -33,7 +33,7 @@ const initialValues = {
     value: '',
     label: ''
   },
-  // direccion_exacta: '',
+  direccion_exacta: '',
 
   // // infoPersonal
   nombre_paciente: '',
@@ -89,6 +89,7 @@ const validationSchema = Yup.object().shape({
   telefono_adicional: Yup.string().required('Teléfono adicional es requerido'),
   ocupacion: Yup.string().required('Ocupación es requerido'),
   lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
+  direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
@@ -520,6 +521,25 @@ export const FormCovid = () => {
                               fullWidth                        
                             />
                           )}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3} >
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <TextField
+                          autoComplete='off'
+                          error={Boolean(touched.direccion_exacta && errors.direccion_exacta)}
+                          fullWidth
+                          helperText={touched.direccion_exacta && errors.direccion_exacta}
+                          label="Dirección Exacta"
+                          name="direccion_exacta"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.direccion_exacta}
+                          variant="outlined"
                         />
                       </Box>
                     </Grid>
