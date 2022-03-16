@@ -34,6 +34,7 @@ import { useTipoIdentificacion } from '../hooks/useTipoIdentificacion';
 import { validationSchema } from '../utils/validationSchema';
 import { generos } from '../data/generos';
 import { formattedDate } from '../utils/constant';
+import { Tutores } from '../data/tutor';
 
 export const FormCovid = () => {
   const [idProvincia, setIdProvincia] = useState('')
@@ -341,7 +342,7 @@ export const FormCovid = () => {
                           helperText={touched.edad && errors.edad}
                           label="Edad"
                           name="edad"
-                          type="text"
+                          type="number"
                           onBlur={handleBlur}
                           onChange={handleChange}
                           value={values.edad}
@@ -624,6 +625,135 @@ export const FormCovid = () => {
                       )}
                     />
                   </Box>
+
+                  {(Boolean(touched.edad) && values.edad) < 18 && (
+                    <>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <Autocomplete 
+                              id="tutor_type"
+                              options={Tutores}
+                              onBlur={handleBlur}
+                              onChange={(e, value) => setFieldValue('tutor_type', value)}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  autoComplete='off'
+                                  name="tutor_type"
+                                  variant="outlined"
+                                  label="Tipo de identificación del tutor"
+                                  error={Boolean(touched.tutor_type && errors.tutor_type)}
+                                  helperText={touched.tutor_type && errors.tutor_type}
+                                  fullWidth                        
+                                />
+                              )}
+                            />
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <Autocomplete 
+                              id="tutor_tipo_identificacion"
+                              options={tiposIdentificacion}
+                              getOptionLabel={(option) => option.label}
+                              onBlur={handleBlur}
+                              onChange={(e, value) => setFieldValue('tutor_tipo_identificacion', value) }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  autoComplete='off'
+                                  name="tutor_tipo_identificacion"
+                                  variant="outlined"
+                                  label="Tipo de identificación"
+                                  error={Boolean(touched.tutor_tipo_identificacion && errors.tutor_tipo_identificacion?.label)}
+                                  helperText={touched.tutor_tipo_identificacion && errors.tutor_tipo_identificacion?.label}
+                                  fullWidth                        
+                                />
+                              )}
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.tutor_identificacion && errors.tutor_identificacion)}
+                              fullWidth
+                              helperText={touched.tutor_identificacion && errors.tutor_identificacion}
+                              label="Identificación Tutor"
+                              name="tutor_identificacion"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.tutor_identificacion}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.tutor_nomber && errors.tutor_nomber)}
+                              fullWidth
+                              helperText={touched.tutor_nomber && errors.tutor_nomber}
+                              label="Nombre Tutor"
+                              name="tutor_nomber"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.tutor_nomber}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.tutor_primer_apellido && errors.tutor_primer_apellido)}
+                              fullWidth
+                              helperText={touched.tutor_primer_apellido && errors.tutor_primer_apellido}
+                              label="Primer apellido Tutor"
+                              name="tutor_primer_apellido"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.tutor_primer_apellido}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.tutor_segundo_apellido && errors.tutor_segundo_apellido)}
+                              fullWidth
+                              helperText={touched.tutor_segundo_apellido && errors.tutor_segundo_apellido}
+                              label="Segundo apellido Tutor"
+                              name="tutor_segundo_apellido"
+                              type="text"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.tutor_segundo_apellido}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </>
+                  )}
 
                   {values.motivo_prueba === motivoPrueba.VIAJE && (
                     <Grid container spacing={3}>
@@ -918,6 +1048,8 @@ export const FormCovid = () => {
                       </Grid>
                     </>
                   )}
+
+                  
       
                 </CardContent>
               </Card>

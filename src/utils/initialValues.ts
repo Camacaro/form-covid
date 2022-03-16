@@ -40,7 +40,7 @@ export interface IInitialValues {
   primer_apellido_paciente: string;
   segundo_apellido_paciente: string;
   correo_electronico: string;
-  edad: string;
+  edad: number|string;
   identificacion: string;
   telefono: string;
   telefono_adicional: string;
@@ -51,6 +51,13 @@ export interface IInitialValues {
   otros_sintomas: string;
   metodo_diagnostico: string;
   motivo_prueba: string;
+
+  tutor_type: string;
+  tutor_nomber: string;
+  tutor_identificacion: string;
+  tutor_primer_apellido: string;
+  tutor_segundo_apellido: string;
+  tutor_tipo_identificacion: ITipoIdentificacion;
 }
 
 export const initialValues: IInitialValues = {
@@ -129,4 +136,15 @@ export const initialValues: IInitialValues = {
   otros_sintomas: '',
   metodo_diagnostico: '',
   motivo_prueba: '',
+
+  tutor_type: '',
+  tutor_identificacion: '',
+  tutor_nomber: '',
+  tutor_primer_apellido: '',
+  tutor_segundo_apellido: '',
+  tutor_tipo_identificacion: {
+    id: '',
+    value: '',
+    label: ''
+  }
 }

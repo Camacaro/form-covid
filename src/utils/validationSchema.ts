@@ -3,7 +3,7 @@ import { motivoPrueba } from '../data/motivoPrueba';
 
 export const validationSchema = Yup.object().shape({
   fecha_muestra: Yup.date().required('Fecha de muestra es requerida'),
-  correo_electronico: Yup.string().email('Correo electrónico inválido').required('Correo electrónico es requerido'),
+  correo_electronico: Yup.string().email('Correo electrónico inválido'),
   nombre_paciente: Yup.string().required('Nombre es requerido'),
   primer_apellido_paciente: Yup.string().required('Primer apellido es requerido'),
   segundo_apellido_paciente: Yup.string().required('Segundo apellido es requerido'),
@@ -11,7 +11,8 @@ export const validationSchema = Yup.object().shape({
   telefono: Yup.string().required('Teléfono es requerido'),
   telefono_adicional: Yup.string().required('Teléfono adicional es requerido'),
   ocupacion: Yup.string().required('Ocupación es requerido'),
-  lugar_trabajo: Yup.string().required('Lugar de trabajo es requerido'),
+  lugar_trabajo: Yup.string(),
+  edad: Yup.number().required('Edad es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
   metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
   genero: Yup.object({
@@ -134,4 +135,43 @@ export const validationSchema = Yup.object().shape({
       is: motivoPrueba.VIAJE,
       then: Yup.date().required('Fecha de viaje es requerida'),
     }),
+  /** Tutor */
+  tutor_type: Yup.string()
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.string().required('Tipo de tutor es requerido'),
+    }),
+  tutor_nomber: Yup.string()
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.string().required('Nombre de tutor es requerido'),
+    }),
+  tutor_primer_apellido: Yup.string()
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.string().required('Primer apellido de tutor es requerido'),
+    }),
+  tutor_segundo_apellido: Yup.string()
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.string().required('Segundo apellido de tutor es requerido'),
+    }),
+  tutor_identificacion: Yup.string()
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.string().required('Tipo de identificación tutor es requerido'),
+    }),
+  tutor_tipo_identificacion: Yup.object({
+      id: Yup.string(),
+      value: Yup.string(),
+      label: Yup.string(),
+    })
+    .when('edad', {
+      is: (value: number) => value && value < 18,
+      then: Yup.object({
+        id: Yup.string().required('ID es requerido'),
+        value: Yup.string().required('Valor es requerido'),
+        label: Yup.string().required('Nombre es requerida'),
+      }),
+    })
 })
