@@ -35,6 +35,7 @@ import { validationSchema } from '../utils/validationSchema';
 import { generos } from '../data/generos';
 import { formattedDate } from '../utils/constant';
 import { Tutores } from '../data/tutor';
+import { postDataToSend } from '../services/postDataToSend';
 
 export const FormCovid = () => {
   const [idProvincia, setIdProvincia] = useState('')
@@ -61,30 +62,81 @@ export const FormCovid = () => {
     try {
       console.log(values)
 
-      const {
-        fecha_muestra,
-        fecha_visita,
-        fecha_primer_contacto,
-        fecha_ultimo_contacto,
-        fecha_inicio_sintomas,
-        fecha_viaje,
-      } = values
+      const fecha_muestra_format = format( values.fecha_muestra as Date, formattedDate );
+      const fecha_visita_format = format( values.fecha_visita as Date, formattedDate );
+      const fecha_primer_contacto_format = format( values.fecha_primer_contacto as Date, formattedDate );
+      const fecha_ultimo_contacto_format = format( values.fecha_ultimo_contacto as Date, formattedDate );
+      const fecha_inicio_sintomas_format = format( values.fecha_inicio_sintomas as Date, formattedDate );
+      const fecha_viaje_format = format( values.fecha_viaje as Date, formattedDate );
 
-      const fecha_muestra_format = format( fecha_muestra as Date, formattedDate );
-      const fecha_visita_format = format( fecha_visita as Date, formattedDate );
-      const fecha_primer_contacto_format = format( fecha_primer_contacto as Date, formattedDate );
-      const fecha_ultimo_contacto_format = format( fecha_ultimo_contacto as Date, formattedDate );
-      const fecha_inicio_sintomas_format = format( fecha_inicio_sintomas as Date, formattedDate );
-      const fecha_viaje_format = format( fecha_viaje as Date, formattedDate );
+      const dataToSend = {
+        "identificacion": values.identificacion,
+        "tipo_identificacion": values.tipo_identificacion.id,
+        "nombre_paciente": values.nombre_paciente,
+        "primer_apellido_paciente": values.primer_apellido_paciente,
+        "segundo_apellido_paciente": values.segundo_apellido_paciente,
+        "nacionalidad": values.nacionalidad.id,
+        "correo_electronico": values.correo_electronico,
+        "sucursal": values.sucursal.id,
+        "codigo_provincia": values.provincia.id,
+        "codigo_canton": values.canton.id,
+        "codigo_distrito": values.distrito.id,
+        // "codigo_barrio": ,
+        "direccion_exacta": values.direccion_exacta,
+        "genero": values.genero.value,
+        // "fecha_nacimiento": ,
+        "edad": values.edad,
+        "telefono": values.telefono,
+        "telefono_adicional": values.telefono_adicional,
+        "ocupacion": values.ocupacion,
+        "lugar_trabajo": values.lugar_trabajo,
+        "contacto_con_caso": values.contacto_caso_confirmado,
+        "nombre_contacto_covid": values.nombre_contacto_covid,
+        "tipo_contacto": values.tipo_contacto,
+        "fecha_primer_contacto": fecha_primer_contacto_format,
+        "fecha_ultimo_contacto": fecha_ultimo_contacto_format,
+        "viaje_realizado": values.viaje_realizado,
+        "lugar_visitado": values.lugar_visitado,
+        "fecha_visita": fecha_visita_format,
+        "presenta_sintomas": values.presenta_sintomas,
+        "sintomas": values.sintomas,
+        "otros_sintomas": values.otros_sintomas,
+        "historial_clinico": values.historial_clinico,
+        "motivo": values.motivo_prueba,
+        "lugar_destino": values.lugar_visitado,
+        "fecha_salida": fecha_viaje_format,
+        "embarazo": 0,
+        "semanas_embarazo": 0,
+        "tipo_tutor": values.tutor_type,
+        "identificacion_tutor": values.tutor_identificacion,
+        "tipo_identificacion_tutor": values.tutor_tipo_identificacion,
+        "nombre_tutor": values.tutor_nomber,
+        "primer_apellido_tutor": values.tutor_primer_apellido,
+        "segundo_apellido_tutor": values.tutor_segundo_apellido,
+        // "fecha_creacion": "2022-03-16T16:05:23.692Z",
+        "fecha_muestra": fecha_muestra_format,
+        // "resultado": "string",
+        // "fecha_resultado": "2022-03-16T16:05:23.692Z",
+        "metodo": values.metodo_diagnostico,
+        // "id_region": ,
+        // "id_area": 0,
+        "fecha_primer_sintoma": fecha_inicio_sintomas_format,
+        // "signos": "string",
+        // "muerto_servicio_salud": 0,
+        // "hisopo_nasofarigeno": 0,
+        // "aspirado_nasofarigeno": 0,
+        // "analisis_solicitado": "string",
+        // "codigo_evento": "string",
+        // "codigo_lugar": "string",
+        // "fecha_evento": "2022-03-16T16:05:23.692Z",
+        // "hospitalizado": 0,
+        // "muestra_enviada": 0,
+        // "resultado_enviado": 0
+      }
 
-      console.log({
-        fecha_muestra_format,
-        fecha_visita_format,
-        fecha_primer_contacto_format,
-        fecha_ultimo_contacto_format,
-        fecha_inicio_sintomas_format,
-        fecha_viaje_format,
-      })
+      const response = await postDataToSend(dataToSend)
+
+      console.log({response})
 
     } catch (err: any) {
       formikHelpers.resetForm();
@@ -128,21 +180,6 @@ export const FormCovid = () => {
 
               <Card>
                 <CardContent>
-                  
-                  {/* <Box marginY={1} >
-                    <TextField
-                      autoComplete='off'
-                      // error={Boolean(touched.name && errors.name)}
-                      fullWidth
-                      // helperText={touched.name && errors.name}
-                      label="Nombre del Producto"
-                      name="name"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      // value={values.name}
-                      variant="outlined"
-                    />
-                  </Box> */}
 
                   <Box marginY={1} >
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
