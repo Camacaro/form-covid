@@ -60,14 +60,16 @@ export const FormCovid = () => {
 
   const onSubmit: any = async (values: IInitialValues, formikHelpers: FormikHelpers<{}>) => {
     try {
-      console.log(values)
 
-      const fecha_muestra_format = format( values.fecha_muestra as Date, formattedDate );
-      const fecha_visita_format = format( values.fecha_visita as Date, formattedDate );
-      const fecha_primer_contacto_format = format( values.fecha_primer_contacto as Date, formattedDate );
-      const fecha_ultimo_contacto_format = format( values.fecha_ultimo_contacto as Date, formattedDate );
-      const fecha_inicio_sintomas_format = format( values.fecha_inicio_sintomas as Date, formattedDate );
-      const fecha_viaje_format = format( values.fecha_viaje as Date, formattedDate );
+      const fecha_muestra_format = values.fecha_muestra ? format( values.fecha_muestra as Date, formattedDate ) : "";
+      const fecha_visita_format = values.fecha_visita ? format( values.fecha_visita as Date, formattedDate ) : "";
+      const fecha_primer_contacto_format = values.fecha_primer_contacto ? format( values.fecha_primer_contacto as Date, formattedDate ) : "";
+      const fecha_ultimo_contacto_format = values.fecha_ultimo_contacto ? format( values.fecha_ultimo_contacto as Date, formattedDate ) : "";
+      const fecha_inicio_sintomas_format = values.fecha_inicio_sintomas ? format( values.fecha_inicio_sintomas as Date, formattedDate ) : "";
+      const fecha_viaje_format = values.fecha_viaje ? format( values.fecha_viaje as Date, formattedDate ) : "";
+      
+      const historial_clinico = values.historial_clinico.map(item => item.value);
+      const sintomas = values.sintomas.map(item => item.value);
 
       const dataToSend = {
         "identificacion": values.identificacion,
@@ -90,26 +92,26 @@ export const FormCovid = () => {
         "telefono_adicional": values.telefono_adicional,
         "ocupacion": values.ocupacion,
         "lugar_trabajo": values.lugar_trabajo,
-        "contacto_con_caso": values.contacto_caso_confirmado,
+        "contacto_con_caso": values.contacto_caso_confirmado ? 1 : 0,
         "nombre_contacto_covid": values.nombre_contacto_covid,
         "tipo_contacto": values.tipo_contacto,
         "fecha_primer_contacto": fecha_primer_contacto_format,
         "fecha_ultimo_contacto": fecha_ultimo_contacto_format,
-        "viaje_realizado": values.viaje_realizado,
-        "lugar_visitado": values.lugar_visitado,
+        "viaje_realizado": values.viaje_realizado ? 1 : 0,
+        "lugar_visitado": values.lugar_visitado.value,
         "fecha_visita": fecha_visita_format,
-        "presenta_sintomas": values.presenta_sintomas,
-        "sintomas": values.sintomas,
+        "presenta_sintomas": values.presenta_sintomas ? 1 : 0,
+        "sintomas": sintomas.toString(),
         "otros_sintomas": values.otros_sintomas,
-        "historial_clinico": values.historial_clinico,
+        "historial_clinico": historial_clinico.toString(),
         "motivo": values.motivo_prueba,
-        "lugar_destino": values.lugar_visitado,
+        "lugar_destino": values.lugar_visitado.value,
         "fecha_salida": fecha_viaje_format,
         "embarazo": 0,
         "semanas_embarazo": 0,
         "tipo_tutor": values.tutor_type,
         "identificacion_tutor": values.tutor_identificacion,
-        "tipo_identificacion_tutor": values.tutor_tipo_identificacion,
+        "tipo_identificacion_tutor": values.tutor_tipo_identificacion.id,
         "nombre_tutor": values.tutor_nomber,
         "primer_apellido_tutor": values.tutor_primer_apellido,
         "segundo_apellido_tutor": values.tutor_segundo_apellido,
@@ -133,11 +135,11 @@ export const FormCovid = () => {
         // "muestra_enviada": 0,
         // "resultado_enviado": 0
       }
-
+      console.log(dataToSend)
+      
       const response = await postDataToSend(dataToSend)
-
       console.log({response})
-
+      
     } catch (err: any) {
       formikHelpers.resetForm();
       formikHelpers.setStatus({ success: false });
