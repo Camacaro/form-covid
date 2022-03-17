@@ -614,8 +614,6 @@ export const FormCovid = () => {
                               variant="outlined"
                               label="Historial clínico"
                               fullWidth
-                              error={Boolean(touched.historial_clinico && values.historial_clinico.length < 1)}
-                              helperText={(touched.historial_clinico && values.historial_clinico.length < 1) ? 'Historial clínico es requerido' : ''}                          
                             />
                           )}
                         />

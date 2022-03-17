@@ -34,15 +34,6 @@ export const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
-  historial_clinico: Yup.array()
-    .of(
-      Yup.object().shape({
-        id: Yup.string().required('ID es requerido'),
-        value: Yup.string().required('Valor es requerido'),
-        label: Yup.string().required('Nombre es requerida'),
-      })
-    )
-    .required('Sintomas es requerido'),
   sucursal: Yup.object({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
