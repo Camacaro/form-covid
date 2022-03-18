@@ -58,6 +58,9 @@ export interface IInitialValues {
   tutor_primer_apellido: string;
   tutor_segundo_apellido: string;
   tutor_tipo_identificacion: ITipoIdentificacion;
+
+  estado_embarazo: boolean;
+  semanas_embarazo: number|string;
 }
 
 export const initialValues: IInitialValues = {
@@ -146,5 +149,8 @@ export const initialValues: IInitialValues = {
     id: '',
     value: '',
     label: ''
-  }
+  },
+
+  estado_embarazo: false,
+  semanas_embarazo: '',
 }

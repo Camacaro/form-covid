@@ -36,6 +36,7 @@ import { generos } from '../data/generos';
 import { formattedDate } from '../utils/constant';
 import { Tutores } from '../data/tutor';
 import { postDataToSend } from '../services/postDataToSend';
+import { isEmptyObject } from '../helper/isEmptyObject';
 
 export const FormCovid = () => {
   const [idProvincia, setIdProvincia] = useState('')
@@ -107,8 +108,8 @@ export const FormCovid = () => {
         "motivo": values.motivo_prueba,
         "lugar_destino": values.lugar_visitado.value,
         "fecha_salida": fecha_viaje_format,
-        "embarazo": 0,
-        "semanas_embarazo": 0,
+        "embarazo": values.estado_embarazo ? 1 : 0,
+        "semanas_embarazo": values.semanas_embarazo && 0,
         "tipo_tutor": values.tutor_type,
         "identificacion_tutor": values.tutor_identificacion,
         "tipo_identificacion_tutor": values.tutor_tipo_identificacion.id,
@@ -141,10 +142,7 @@ export const FormCovid = () => {
       console.log({response})
       
     } catch (err: any) {
-      formikHelpers.resetForm();
-      formikHelpers.setStatus({ success: false });
-      formikHelpers.setErrors({ submit: err.message });
-      formikHelpers.setSubmitting(false);
+      console.log(err)
     }
   }
 
@@ -1086,7 +1084,44 @@ export const FormCovid = () => {
                     </>
                   )}
 
-                  
+                  <Box marginY={1} >
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={values.estado_embarazo}
+                          onChange={handleChange}
+                          value={values.estado_embarazo}
+                          name="estado_embarazo"
+                        />
+                      )}
+                      label="¿Se encuentra embarazada?"
+                    />
+                  </Box>
+
+                  {values.estado_embarazo && (
+                    <>
+                      <Grid container spacing={3} >
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.semanas_embarazo && errors.semanas_embarazo)}
+                              fullWidth
+                              helperText={touched.semanas_embarazo && errors.semanas_embarazo}
+                              label="Semanas de embarazo"
+                              name="semanas_embarazo"
+                              type="number"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.semanas_embarazo}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+
+                      </Grid>
+                    </>
+                  )}
       
                 </CardContent>
               </Card>
@@ -1099,14 +1134,25 @@ export const FormCovid = () => {
               isLoading 
               ? <CircularProgress />
               : (
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  Crear
-                </Button>
+                <>
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    Crear
+                  </Button>
+
+                  {
+                    !isEmptyObject(errors) && (
+                      <FormHelperText error>
+                        Hay algunos errores en el formulario
+                      </FormHelperText>
+                    )
+                  }
+                
+                </>
               )
             }
           </Box>       

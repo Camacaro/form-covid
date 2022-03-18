@@ -164,5 +164,12 @@ export const validationSchema = Yup.object().shape({
         value: Yup.string().required('Valor es requerido'),
         label: Yup.string().required('Nombre es requerida'),
       }),
+    }),
+  /** Embarazo */
+  estado_embarazo: Yup.boolean(),
+  semanas_embarazo: Yup.number()
+    .when('estado_embarazo', {
+      is: true,
+      then: Yup.number().required('Semanas de embarazo es requerida'),
     })
 })
