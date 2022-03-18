@@ -51,6 +51,7 @@ export interface IInitialValues {
   otros_sintomas: string;
   metodo_diagnostico: string;
   motivo_prueba: string;
+  fecha_nacimiento: Date|string;
 
   tutor_type: string;
   tutor_nomber: string;
@@ -122,6 +123,7 @@ export const initialValues: IInitialValues = {
   fecha_inicio_sintomas: '',
   fecha_ultimo_contacto: '',
   fecha_viaje: '',
+  fecha_nacimiento: '',
 
   direccion_exacta: '',
   nombre_paciente: '',

@@ -15,6 +15,7 @@ export const validationSchema = Yup.object().shape({
   edad: Yup.number().required('Edad es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
   metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
+  fecha_nacimiento: Yup.date().required('Fecha de nacimiento es requerido'),
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
