@@ -61,7 +61,9 @@ export const FormCovid = () => {
 
   const onSubmit: any = async (values: IInitialValues, formikHelpers: FormikHelpers<{}>) => {
     try {
-      
+
+      // console.log(values)
+      // debugger;
       /** Fechas opcionales */
       const fecha_visita_format = values.fecha_visita ? format( values.fecha_visita as Date, formattedDate ) : "";
       const fecha_primer_contacto_format = values.fecha_primer_contacto ? format( values.fecha_primer_contacto as Date, formattedDate ) : "";
@@ -75,6 +77,9 @@ export const FormCovid = () => {
       
       const historial_clinico = values.historial_clinico.map(item => item.value);
       const sintomas = values.sintomas.map(item => item.value);
+
+      const lugar_visitado = values.lugar_visitado.value ? values.lugar_visitado.value.split('-')[0] : ""; 
+      const pais_destino = values.pais_destino.value ? values.pais_destino.value.split('-')[0]: "";
 
       const dataToSend = {
         identificacion: values.identificacion,
@@ -102,17 +107,17 @@ export const FormCovid = () => {
         fecha_primer_contacto: fecha_primer_contacto_format,
         fecha_ultimo_contacto: fecha_ultimo_contacto_format,
         viaje_realizado: values.viaje_realizado ? 1 : 0,
-        lugar_visitado: values.lugar_visitado.value,
+        lugar_visitado: lugar_visitado,
         fecha_visita: fecha_visita_format,
         presenta_sintomas: values.presenta_sintomas ? 1 : 0,
         sintomas: sintomas.toString(),
         otros_sintomas: values.otros_sintomas,
         historial_clinico: historial_clinico.toString(),
         motivo: values.motivo_prueba,
-        lugar_destino: values.lugar_visitado.value,
+        lugar_destino: pais_destino,
         fecha_salida: fecha_viaje_format,
         embarazo: values.estado_embarazo ? 1 : 0,
-        semanas_embarazo: values.semanas_embarazo && 0,
+        semanas_embarazo: values.semanas_embarazo ? values.semanas_embarazo : 0,
         tipo_tutor: values.tutor_type,
         identificacion_tutor: values.tutor_identificacion,
         tipo_identificacion_tutor: values.tutor_tipo_identificacion.id,
