@@ -34,7 +34,7 @@ import { useSucursales } from '../hooks/useSucursales';
 import { useTipoIdentificacion } from '../hooks/useTipoIdentificacion';
 import { validationSchema } from '../utils/validationSchema';
 import { generos } from '../data/generos';
-import { formattedDate } from '../utils/constant';
+import { formattedDate, inputFormatDate } from '../utils/constant';
 import { Tutores } from '../data/tutor';
 import { postDataToSend } from '../services/postDataToSend';
 import { isEmptyObject } from '../helper/isEmptyObject';
@@ -211,7 +211,7 @@ export const FormCovid = () => {
                       <Stack spacing={3}>
                         <DesktopDatePicker
                           label="Fecha de muestra"
-                          inputFormat="MM/dd/yyyy"
+                          inputFormat={inputFormatDate}
                           value={values.fecha_muestra}
                           onChange={value => setFieldValue('fecha_muestra', value)}
                           renderInput={(params) => <TextField {...params} />}
@@ -674,7 +674,7 @@ export const FormCovid = () => {
                           <Stack spacing={3}>
                             <DesktopDatePicker
                               label="Fecha de nacimiento"
-                              inputFormat="MM/dd/yyyy"
+                              inputFormat={inputFormatDate}
                               value={values.fecha_nacimiento}
                               onChange={value => setFieldValue('fecha_nacimiento', value)}
                               renderInput={(params) => <TextField {...params} />}
@@ -871,7 +871,7 @@ export const FormCovid = () => {
                             <Stack spacing={3}>
                               <DesktopDatePicker
                                 label="Fecha de viaje"
-                                inputFormat="MM/dd/yyyy"
+                                inputFormat={inputFormatDate}
                                 value={values.fecha_viaje}
                                 onChange={value => setFieldValue('fecha_viaje', value)}
                                 renderInput={(params) => <TextField {...params} />}
@@ -933,7 +933,7 @@ export const FormCovid = () => {
                             <Stack spacing={3}>
                               <DesktopDatePicker
                                 label="Fecha de visita"
-                                inputFormat="MM/dd/yyyy"
+                                inputFormat={inputFormatDate}
                                 value={values.fecha_visita}
                                 onChange={value => setFieldValue('fecha_visita', value)}
                                 renderInput={(params) => <TextField {...params} />}
@@ -1010,7 +1010,7 @@ export const FormCovid = () => {
                               <Stack spacing={3}>
                                 <DesktopDatePicker
                                   label="Desde cuando"
-                                  inputFormat="MM/dd/yyyy"
+                                  inputFormat={inputFormatDate}
                                   value={values.fecha_primer_contacto}
                                   onChange={value => setFieldValue('fecha_primer_contacto', value)}
                                   renderInput={(params) => <TextField {...params} />}
@@ -1030,7 +1030,7 @@ export const FormCovid = () => {
                               <Stack spacing={3}>
                                 <DesktopDatePicker
                                   label="Hasta cuando"
-                                  inputFormat="MM/dd/yyyy"
+                                  inputFormat={inputFormatDate}
                                   value={values.fecha_ultimo_contacto}
                                   onChange={value => setFieldValue('fecha_ultimo_contacto', value)}
                                   renderInput={(params) => <TextField {...params} />}
@@ -1096,7 +1096,7 @@ export const FormCovid = () => {
                               <Stack spacing={3}>
                                 <DesktopDatePicker
                                   label="Fecha de inicio de síntomas"
-                                  inputFormat="MM/dd/yyyy"
+                                  inputFormat={inputFormatDate}
                                   value={values.fecha_inicio_sintomas}
                                   onChange={value => setFieldValue('fecha_inicio_sintomas', value)}
                                   renderInput={(params) => <TextField {...params} />}
