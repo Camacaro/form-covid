@@ -155,6 +155,7 @@ export const FormCovid = () => {
 
       setIsLoading(false);
       toggleSnackbar()
+      formikHelpers.resetForm();
       setMsgSnackbar('Se ha enviado la información correctamente');
     } catch (err: any) {
       console.log(err)
