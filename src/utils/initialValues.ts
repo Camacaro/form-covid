@@ -123,7 +123,7 @@ export const initialValues: IInitialValues = {
   fecha_inicio_sintomas: '',
   fecha_ultimo_contacto: '',
   fecha_viaje: '',
-  fecha_nacimiento: '',
+  fecha_nacimiento: new Date(),
 
   direccion_exacta: '',
   nombre_paciente: '',

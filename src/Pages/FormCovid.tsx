@@ -1191,19 +1191,24 @@ export const FormCovid = () => {
                           >
                             Crear
                           </Button>
-
-                          {
-                            !isEmptyObject(errors) && (
-                              <FormHelperText error>
-                                Hay algunos errores en el formulario
-                              </FormHelperText>
-                            )
-                          }
-                        
                         </>
                       )
                     }
                   </Box>  
+
+                  <Box mt={3} sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                  }}>
+                    <Box flexGrow={1} />
+                    {
+                      !isEmptyObject(errors) && (
+                        <FormHelperText error>
+                          Hay algunos errores en el formulario
+                        </FormHelperText>
+                      )
+                    }
+                  </Box>
       
                 </CardContent>
               </Card>
