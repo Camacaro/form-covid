@@ -12,7 +12,8 @@ import {
   Button,
   Autocomplete,
   FormControlLabel,
-  Checkbox ,
+  Checkbox,
+  Snackbar,
 } from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -36,12 +37,15 @@ import { generos } from '../data/generos';
 import { formattedDate } from '../utils/constant';
 import { Tutores } from '../data/tutor';
 import { postDataToSend } from '../services/postDataToSend';
+import { isEmptyObject } from '../helper/isEmptyObject';
 
 export const FormCovid = () => {
   const [idProvincia, setIdProvincia] = useState('')
   const [idCanton, setIdCanton] = useState('')
 
   const [isLoading, setIsLoading] = useState(false)
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [msgSnackbar, setMsgSnackbar] = useState('')
 
   const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
   const { paises } = usePaises();
@@ -58,91 +62,104 @@ export const FormCovid = () => {
     if(idCanton) onSelectCanton(idCanton)
   }, [idCanton])
 
+  const toggleSnackbar = () => setOpenSnackbar(prev => !prev);
+
   const onSubmit: any = async (values: IInitialValues, formikHelpers: FormikHelpers<{}>) => {
     try {
-      console.log(values)
 
+      setIsLoading(true);
+
+      /** Fechas opcionales */
+      const fecha_visita_format = values.fecha_visita ? format( values.fecha_visita as Date, formattedDate ) : "";
+      const fecha_primer_contacto_format = values.fecha_primer_contacto ? format( values.fecha_primer_contacto as Date, formattedDate ) : "";
+      const fecha_ultimo_contacto_format = values.fecha_ultimo_contacto ? format( values.fecha_ultimo_contacto as Date, formattedDate ) : "";
+      const fecha_inicio_sintomas_format = values.fecha_inicio_sintomas ? format( values.fecha_inicio_sintomas as Date, formattedDate ) : "";
+      const fecha_viaje_format = values.fecha_viaje ? format( values.fecha_viaje as Date, formattedDate ) : "";
+      
+      /** Fechas obligatoria */
       const fecha_muestra_format = format( values.fecha_muestra as Date, formattedDate );
-      const fecha_visita_format = format( values.fecha_visita as Date, formattedDate );
-      const fecha_primer_contacto_format = format( values.fecha_primer_contacto as Date, formattedDate );
-      const fecha_ultimo_contacto_format = format( values.fecha_ultimo_contacto as Date, formattedDate );
-      const fecha_inicio_sintomas_format = format( values.fecha_inicio_sintomas as Date, formattedDate );
-      const fecha_viaje_format = format( values.fecha_viaje as Date, formattedDate );
+      const fecha_nacimiento_format = format( values.fecha_nacimiento as Date, formattedDate );
+      
+      const historial_clinico = values.historial_clinico.map(item => item.value);
+      const sintomas = values.sintomas.map(item => item.value);
+
+      const lugar_visitado = values.lugar_visitado.value ? values.lugar_visitado.value.split('-')[0] : ""; 
+      const pais_destino = values.pais_destino.value ? values.pais_destino.value.split('-')[0]: "";
 
       const dataToSend = {
-        "identificacion": values.identificacion,
-        "tipo_identificacion": values.tipo_identificacion.id,
-        "nombre_paciente": values.nombre_paciente,
-        "primer_apellido_paciente": values.primer_apellido_paciente,
-        "segundo_apellido_paciente": values.segundo_apellido_paciente,
-        "nacionalidad": values.nacionalidad.id,
-        "correo_electronico": values.correo_electronico,
-        "sucursal": values.sucursal.id,
-        "codigo_provincia": values.provincia.id,
-        "codigo_canton": values.canton.id,
-        "codigo_distrito": values.distrito.id,
-        // "codigo_barrio": ,
-        "direccion_exacta": values.direccion_exacta,
-        "genero": values.genero.value,
-        // "fecha_nacimiento": ,
-        "edad": values.edad,
-        "telefono": values.telefono,
-        "telefono_adicional": values.telefono_adicional,
-        "ocupacion": values.ocupacion,
-        "lugar_trabajo": values.lugar_trabajo,
-        "contacto_con_caso": values.contacto_caso_confirmado,
-        "nombre_contacto_covid": values.nombre_contacto_covid,
-        "tipo_contacto": values.tipo_contacto,
-        "fecha_primer_contacto": fecha_primer_contacto_format,
-        "fecha_ultimo_contacto": fecha_ultimo_contacto_format,
-        "viaje_realizado": values.viaje_realizado,
-        "lugar_visitado": values.lugar_visitado,
-        "fecha_visita": fecha_visita_format,
-        "presenta_sintomas": values.presenta_sintomas,
-        "sintomas": values.sintomas,
-        "otros_sintomas": values.otros_sintomas,
-        "historial_clinico": values.historial_clinico,
-        "motivo": values.motivo_prueba,
-        "lugar_destino": values.lugar_visitado,
-        "fecha_salida": fecha_viaje_format,
-        "embarazo": 0,
-        "semanas_embarazo": 0,
-        "tipo_tutor": values.tutor_type,
-        "identificacion_tutor": values.tutor_identificacion,
-        "tipo_identificacion_tutor": values.tutor_tipo_identificacion,
-        "nombre_tutor": values.tutor_nomber,
-        "primer_apellido_tutor": values.tutor_primer_apellido,
-        "segundo_apellido_tutor": values.tutor_segundo_apellido,
-        // "fecha_creacion": "2022-03-16T16:05:23.692Z",
-        "fecha_muestra": fecha_muestra_format,
-        // "resultado": "string",
-        // "fecha_resultado": "2022-03-16T16:05:23.692Z",
-        "metodo": values.metodo_diagnostico,
-        // "id_region": ,
-        // "id_area": 0,
-        "fecha_primer_sintoma": fecha_inicio_sintomas_format,
-        // "signos": "string",
-        // "muerto_servicio_salud": 0,
-        // "hisopo_nasofarigeno": 0,
-        // "aspirado_nasofarigeno": 0,
-        // "analisis_solicitado": "string",
-        // "codigo_evento": "string",
-        // "codigo_lugar": "string",
-        // "fecha_evento": "2022-03-16T16:05:23.692Z",
-        // "hospitalizado": 0,
-        // "muestra_enviada": 0,
-        // "resultado_enviado": 0
+        identificacion: values.identificacion,
+        tipo_identificacion: values.tipo_identificacion.id,
+        nombre_paciente: values.nombre_paciente,
+        primer_apellido_paciente: values.primer_apellido_paciente,
+        segundo_apellido_paciente: values.segundo_apellido_paciente,
+        nacionalidad: values.nacionalidad.id,
+        correo_electronico: values.correo_electronico,
+        sucursal: values.sucursal.id,
+        codigo_provincia: values.provincia.id,
+        codigo_canton: values.canton.id,
+        codigo_distrito: values.distrito.id,
+        direccion_exacta: values.direccion_exacta,
+        genero: values.genero.value,
+        fecha_nacimiento: fecha_nacimiento_format,
+        edad: values.edad,
+        telefono: values.telefono,
+        telefono_adicional: values.telefono_adicional,
+        ocupacion: values.ocupacion,
+        lugar_trabajo: values.lugar_trabajo,
+        contacto_con_caso: values.contacto_caso_confirmado ? 1 : 0,
+        nombre_contacto_covid: values.nombre_contacto_covid,
+        tipo_contacto: values.tipo_contacto,
+        fecha_primer_contacto: fecha_primer_contacto_format,
+        fecha_ultimo_contacto: fecha_ultimo_contacto_format,
+        viaje_realizado: values.viaje_realizado ? 1 : 0,
+        lugar_visitado: lugar_visitado,
+        fecha_visita: fecha_visita_format,
+        presenta_sintomas: values.presenta_sintomas ? 1 : 0,
+        sintomas: sintomas.toString(),
+        otros_sintomas: values.otros_sintomas,
+        historial_clinico: historial_clinico.toString(),
+        motivo: values.motivo_prueba,
+        lugar_destino: pais_destino,
+        fecha_salida: fecha_viaje_format,
+        embarazo: values.estado_embarazo ? 1 : 0,
+        semanas_embarazo: values.semanas_embarazo ? values.semanas_embarazo : 0,
+        tipo_tutor: values.tutor_type,
+        identificacion_tutor: values.tutor_identificacion,
+        tipo_identificacion_tutor: values.tutor_tipo_identificacion.id,
+        nombre_tutor: values.tutor_nomber,
+        primer_apellido_tutor: values.tutor_primer_apellido,
+        segundo_apellido_tutor: values.tutor_segundo_apellido,
+        fecha_muestra: fecha_muestra_format,
+        metodo: values.metodo_diagnostico,
+        fecha_primer_sintoma: fecha_inicio_sintomas_format,
+        // codigo_barrio: ,
+        // fecha_creacion: "2022-03-16T16:05:23.692Z",
+        // resultado: "string",
+        // fecha_resultado: "2022-03-16T16:05:23.692Z",
+        // id_region: ,
+        // id_area: 0,
+        // signos: "string",
+        // muerto_servicio_salud: 0,
+        // hisopo_nasofarigeno: 0,
+        // aspirado_nasofarigeno: 0,
+        // analisis_solicitado: "string",
+        // codigo_evento: "string",
+        // codigo_lugar: "string",
+        // fecha_evento: "2022-03-16T16:05:23.692Z",
+        // hospitalizado: 0,
+        // muestra_enviada: 0,
+        // resultado_enviado: 0
       }
 
-      const response = await postDataToSend(dataToSend)
+      const response = await postDataToSend(dataToSend);
 
-      console.log({response})
-
+      setIsLoading(false);
+      toggleSnackbar()
+      setMsgSnackbar('Se ha enviado la información correctamente');
     } catch (err: any) {
-      formikHelpers.resetForm();
-      formikHelpers.setStatus({ success: false });
-      formikHelpers.setErrors({ submit: err.message });
-      formikHelpers.setSubmitting(false);
+      console.log(err)
+      toggleSnackbar()
+      setMsgSnackbar('Ha ocurrido un error al enviar la información');
     }
   }
 
@@ -166,6 +183,13 @@ export const FormCovid = () => {
           values,
         }) => (
         <form onSubmit={handleSubmit}>
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={toggleSnackbar}
+            message={msgSnackbar}
+          />
 
           <Grid
             container
@@ -612,8 +636,6 @@ export const FormCovid = () => {
                               variant="outlined"
                               label="Historial clínico"
                               fullWidth
-                              error={Boolean(touched.historial_clinico && values.historial_clinico.length < 1)}
-                              helperText={(touched.historial_clinico && values.historial_clinico.length < 1) ? 'Historial clínico es requerido' : ''}                          
                             />
                           )}
                         />
@@ -644,24 +666,48 @@ export const FormCovid = () => {
                     </Grid>
                   </Grid>
 
-                  <Box marginY={1} >
-                    <Autocomplete 
-                      id="motivo_prueba"
-                      options={motivosPrueba}
-                      onBlur={handleBlur}
-                      onChange={(e, value) => setFieldValue('motivo_prueba', value)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          autoComplete='off'
-                          name="motivo_prueba"
-                          variant="outlined"
-                          label="Motivo de realizar la prueba"
-                          fullWidth                        
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                          <Stack spacing={3}>
+                            <DesktopDatePicker
+                              label="Fecha de nacimiento"
+                              inputFormat="MM/dd/yyyy"
+                              value={values.fecha_nacimiento}
+                              onChange={value => setFieldValue('fecha_nacimiento', value)}
+                              renderInput={(params) => <TextField {...params} />}
+                            />
+                          </Stack>
+                        </LocalizationProvider>
+
+                        <FormHelperText error>
+                          {errors.fecha_nacimiento}
+                        </FormHelperText>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <Box marginY={1} >
+                        <Autocomplete 
+                          id="motivo_prueba"
+                          options={motivosPrueba}
+                          onBlur={handleBlur}
+                          onChange={(e, value) => setFieldValue('motivo_prueba', value)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              autoComplete='off'
+                              name="motivo_prueba"
+                              variant="outlined"
+                              label="Motivo de realizar la prueba"
+                              fullWidth                        
+                            />
+                          )}
                         />
-                      )}
-                    />
-                  </Box>
+                      </Box>
+                    </Grid>
+                  </Grid>
 
                   {(Boolean(touched.edad) && values.edad) < 18 && (
                     <>
@@ -1086,30 +1132,89 @@ export const FormCovid = () => {
                     </>
                   )}
 
-                  
+                  <Box marginY={1} >
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={values.estado_embarazo}
+                          onChange={handleChange}
+                          value={values.estado_embarazo}
+                          name="estado_embarazo"
+                        />
+                      )}
+                      label="¿Se encuentra embarazada?"
+                    />
+                  </Box>
+
+                  {values.estado_embarazo && (
+                    <>
+                      <Grid container spacing={3} >
+                        <Grid item xs={12} md={6}>
+                          <Box marginY={1} >
+                            <TextField
+                              autoComplete='off'
+                              error={Boolean(touched.semanas_embarazo && errors.semanas_embarazo)}
+                              fullWidth
+                              helperText={touched.semanas_embarazo && errors.semanas_embarazo}
+                              label="Semanas de embarazo"
+                              name="semanas_embarazo"
+                              type="number"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              value={values.semanas_embarazo}
+                              variant="outlined"
+                            />
+                          </Box>
+                        </Grid>
+
+                      </Grid>
+                    </>
+                  )}
+
+
+                  <Box mt={3} sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                  }}>
+                    {
+                      isLoading 
+                      ? <CircularProgress />
+                      : (
+                        <>
+                          <Box flexGrow={1} />
+
+                          <Button
+                            color="secondary"
+                            variant="contained"
+                            type="submit"
+                            disabled={isLoading}
+                          >
+                            Crear
+                          </Button>
+                        </>
+                      )
+                    }
+                  </Box>  
+
+                  <Box mt={3} sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                  }}>
+                    <Box flexGrow={1} />
+                    {
+                      !isEmptyObject(errors) && (
+                        <FormHelperText error>
+                          Hay algunos errores en el formulario
+                        </FormHelperText>
+                      )
+                    }
+                  </Box>
       
                 </CardContent>
               </Card>
 
             </Grid>
           </Grid> 
-
-          <Box mt={3}>
-            {
-              isLoading 
-              ? <CircularProgress />
-              : (
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  Crear
-                </Button>
-              )
-            }
-          </Box>       
         </form>
       )}
       </Formik>

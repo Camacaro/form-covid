@@ -15,10 +15,19 @@ export const validationSchema = Yup.object().shape({
   edad: Yup.number().required('Edad es requerido'),
   direccion_exacta: Yup.string().required('Dirección exacta es requerido'),
   metodo_diagnostico: Yup.string().required('Método de diagnóstico es requerido'),
+  fecha_nacimiento: Yup.date().required('Fecha de nacimiento es requerido'),
   genero: Yup.object({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
+  historial_clinico: Yup.array()
+    .of(
+      Yup.object().shape({
+        id: Yup.string(),
+        value: Yup.string(),
+        label: Yup.string(),
+      })
+    ),
   provincia: Yup.object({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
@@ -34,15 +43,6 @@ export const validationSchema = Yup.object().shape({
     value: Yup.string().required('Valor es requerido'),
     label: Yup.string().required('Nombre es requerida'),
   }),
-  historial_clinico: Yup.array()
-    .of(
-      Yup.object().shape({
-        id: Yup.string().required('ID es requerido'),
-        value: Yup.string().required('Valor es requerido'),
-        label: Yup.string().required('Nombre es requerida'),
-      })
-    )
-    .required('Sintomas es requerido'),
   sucursal: Yup.object({
     id: Yup.string().required('ID es requerido'),
     value: Yup.string().required('Valor es requerido'),
@@ -173,5 +173,12 @@ export const validationSchema = Yup.object().shape({
         value: Yup.string().required('Valor es requerido'),
         label: Yup.string().required('Nombre es requerida'),
       }),
+    }),
+  /** Embarazo */
+  estado_embarazo: Yup.boolean(),
+  semanas_embarazo: Yup.number()
+    .when('estado_embarazo', {
+      is: true,
+      then: Yup.number().required('Semanas de embarazo es requerida'),
     })
 })

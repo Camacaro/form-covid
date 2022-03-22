@@ -51,6 +51,7 @@ export interface IInitialValues {
   otros_sintomas: string;
   metodo_diagnostico: string;
   motivo_prueba: string;
+  fecha_nacimiento: Date|string;
 
   tutor_type: string;
   tutor_nomber: string;
@@ -58,6 +59,9 @@ export interface IInitialValues {
   tutor_primer_apellido: string;
   tutor_segundo_apellido: string;
   tutor_tipo_identificacion: ITipoIdentificacion;
+
+  estado_embarazo: boolean;
+  semanas_embarazo: number|string;
 }
 
 export const initialValues: IInitialValues = {
@@ -119,6 +123,7 @@ export const initialValues: IInitialValues = {
   fecha_inicio_sintomas: '',
   fecha_ultimo_contacto: '',
   fecha_viaje: '',
+  fecha_nacimiento: new Date(),
 
   direccion_exacta: '',
   nombre_paciente: '',
@@ -146,5 +151,8 @@ export const initialValues: IInitialValues = {
     id: '',
     value: '',
     label: ''
-  }
+  },
+
+  estado_embarazo: false,
+  semanas_embarazo: '',
 }
