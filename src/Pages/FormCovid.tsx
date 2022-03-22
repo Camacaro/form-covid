@@ -12,7 +12,8 @@ import {
   Button,
   Autocomplete,
   FormControlLabel,
-  Checkbox ,
+  Checkbox,
+  Snackbar,
 } from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -43,6 +44,8 @@ export const FormCovid = () => {
   const [idCanton, setIdCanton] = useState('')
 
   const [isLoading, setIsLoading] = useState(false)
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [msgSnackbar, setMsgSnackbar] = useState('')
 
   const { provincias, cantones, distritos, onSelectCanton, onSelectProvincia } = useDirection()
   const { paises } = usePaises();
@@ -59,11 +62,13 @@ export const FormCovid = () => {
     if(idCanton) onSelectCanton(idCanton)
   }, [idCanton])
 
+  const toggleSnackbar = () => setOpenSnackbar(prev => !prev);
+
   const onSubmit: any = async (values: IInitialValues, formikHelpers: FormikHelpers<{}>) => {
     try {
 
-      // console.log(values)
-      // debugger;
+      setIsLoading(true);
+
       /** Fechas opcionales */
       const fecha_visita_format = values.fecha_visita ? format( values.fecha_visita as Date, formattedDate ) : "";
       const fecha_primer_contacto_format = values.fecha_primer_contacto ? format( values.fecha_primer_contacto as Date, formattedDate ) : "";
@@ -145,13 +150,16 @@ export const FormCovid = () => {
         // muestra_enviada: 0,
         // resultado_enviado: 0
       }
-      console.log(dataToSend)
-      
-      const response = await postDataToSend(dataToSend)
-      console.log({response})
-      
+
+      const response = await postDataToSend(dataToSend);
+
+      setIsLoading(false);
+      toggleSnackbar()
+      setMsgSnackbar('Se ha enviado la información correctamente');
     } catch (err: any) {
       console.log(err)
+      toggleSnackbar()
+      setMsgSnackbar('Ha ocurrido un error al enviar la información');
     }
   }
 
@@ -175,6 +183,13 @@ export const FormCovid = () => {
           values,
         }) => (
         <form onSubmit={handleSubmit}>
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={toggleSnackbar}
+            message={msgSnackbar}
+          />
 
           <Grid
             container
@@ -1155,40 +1170,46 @@ export const FormCovid = () => {
                       </Grid>
                     </>
                   )}
+
+
+                  <Box mt={3} sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                  }}>
+                    {
+                      isLoading 
+                      ? <CircularProgress />
+                      : (
+                        <>
+                          <Box flexGrow={1} />
+
+                          <Button
+                            color="secondary"
+                            variant="contained"
+                            type="submit"
+                            disabled={isLoading}
+                          >
+                            Crear
+                          </Button>
+
+                          {
+                            !isEmptyObject(errors) && (
+                              <FormHelperText error>
+                                Hay algunos errores en el formulario
+                              </FormHelperText>
+                            )
+                          }
+                        
+                        </>
+                      )
+                    }
+                  </Box>  
       
                 </CardContent>
               </Card>
 
             </Grid>
           </Grid> 
-
-          <Box mt={3}>
-            {
-              isLoading 
-              ? <CircularProgress />
-              : (
-                <>
-                  <Button
-                    color="secondary"
-                    variant="contained"
-                    type="submit"
-                    disabled={isLoading}
-                  >
-                    Crear
-                  </Button>
-
-                  {
-                    !isEmptyObject(errors) && (
-                      <FormHelperText error>
-                        Hay algunos errores en el formulario
-                      </FormHelperText>
-                    )
-                  }
-                
-                </>
-              )
-            }
-          </Box>       
         </form>
       )}
       </Formik>
